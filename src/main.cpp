@@ -38,10 +38,30 @@ using namespace LAMMPS_NS;
 /* ----------------------------------------------------------------------
    main program to drive LAMMPS
 ------------------------------------------------------------------------- */
-
+#include <cuda_runtime.h>
 int main(int argc, char **argv)
 {
   MPI_Init(&argc, &argv);
+
+  int deviceCount = 0;
+  int rank, nprocs;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+
+  cudaGetDeviceCount(&deviceCount);
+
+  printf("%d: %d ranks, %d gpus\n", rank, nprocs, deviceCount);
+
+  int dev, len = 15;
+  char gpu_id[15];
+  cudaDeviceProp deviceProp;
+
+  for (dev = 0; dev < deviceCount; ++dev) {
+    cudaSetDevice(dev);
+    cudaGetDeviceProperties(&deviceProp, dev);
+    cudaDeviceGetPCIBusId(gpu_id, len, dev);
+    printf("%d: dev %d: %s\n",  rank, dev, gpu_id);
+  }
 
   MPI_Comm lammps_comm = MPI_COMM_WORLD;
 

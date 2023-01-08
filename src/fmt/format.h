@@ -737,18 +737,7 @@ inline auto code_point_index(basic_string_view<char8_type> s, size_t n)
       string_view(reinterpret_cast<const char*>(s.data()), s.size()), n);
 }
 
-#ifndef FMT_USE_FLOAT128
-#  ifdef __SIZEOF_FLOAT128__
-#    define FMT_USE_FLOAT128 1
-#  else
-#    define FMT_USE_FLOAT128 0
-#  endif
-#endif
-#if FMT_USE_FLOAT128
-using float128 = __float128;
-#else
 using float128 = void;
-#endif
 template <typename T> using is_float128 = std::is_same<T, float128>;
 
 template <typename T>
