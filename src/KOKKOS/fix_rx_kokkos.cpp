@@ -374,7 +374,7 @@ int FixRxKokkos<DeviceType>::k_rkf45_h0 (const int neq, const double t, const do
    // Exit with this value if the bounds cross each other.
 
    // Adjust upper bound based on ydot ...
-   double hg = sqrt(hmin*hmax);
+   double hg = Kokkos::Experimental::sqrt(hmin*hmax);
 
    //if (hmax < hmin)
    //{
@@ -414,7 +414,7 @@ int FixRxKokkos<DeviceType>::k_rkf45_h0 (const int neq, const double t, const do
          yddnrm += wterr * wterr;
       }
 
-      yddnrm = sqrt( yddnrm / double(neq) );
+      yddnrm = Kokkos::Experimental::sqrt( yddnrm / double(neq) );
 
       //std::cout << "iter " << _iter << " hg " << hg << " y'' " << yddnrm << std::endl;
       //std::cout << "ydot " << ydot[neq-1] << std::endl;
@@ -428,7 +428,7 @@ int FixRxKokkos<DeviceType>::k_rkf45_h0 (const int neq, const double t, const do
       }
 
       // Get the new value of h ...
-      hnew = (yddnrm*hmax*hmax > 2.0) ? sqrt(2.0 / yddnrm) : sqrt(hg * hmax);
+      hnew = (yddnrm*hmax*hmax > 2.0) ? Kokkos::Experimental::sqrt(2.0 / yddnrm) : sqrt(hg * hmax);
 
       // test the stopping conditions.
       double hrat = hnew / hg;
@@ -514,7 +514,7 @@ void FixRxKokkos<DeviceType>::k_rkf45(const int neq, const double t_stop, Vector
         err2 += wterr * wterr;
       }
 
-    double err = fmax( uround, sqrt( err2 / double(nspecies) ));
+    double err = fmax( uround, Kokkos::Experimental::sqrt( err2 / double(nspecies) ));
 
     // Accept the solution?
     if (err <= 1.0 || h <= h_min) {
@@ -526,7 +526,7 @@ void FixRxKokkos<DeviceType>::k_rkf45(const int neq, const double t_stop, Vector
     }
 
     // Adjust h for the next step.
-    double hfac = hsafe * sqrt( sqrt( 1.0 / err ) );
+    double hfac = hsafe * Kokkos::Experimental::sqrt( sqrt( 1.0 / err ) );
 
     // Limit the adaption.
     hfac = fmax( hfac, 1.0 / adaption_limit );
@@ -691,7 +691,7 @@ int FixRxKokkos<DeviceType>::rkf45_h0(const int neq, const double t, const doubl
    // Exit with this value if the bounds cross each other.
 
    // Adjust upper bound based on ydot ...
-   double hg = sqrt(hmin*hmax);
+   double hg = Kokkos::Experimental::sqrt(hmin*hmax);
 
    //if (hmax < hmin)
    //{
@@ -731,7 +731,7 @@ int FixRxKokkos<DeviceType>::rkf45_h0(const int neq, const double t, const doubl
          yddnrm += wterr * wterr;
       }
 
-      yddnrm = sqrt( yddnrm / double(neq) );
+      yddnrm = Kokkos::Experimental::sqrt( yddnrm / double(neq) );
 
       //std::cout << "iter " << _iter << " hg " << hg << " y'' " << yddnrm << std::endl;
       //std::cout << "ydot " << ydot[neq-1] << std::endl;
@@ -745,7 +745,7 @@ int FixRxKokkos<DeviceType>::rkf45_h0(const int neq, const double t, const doubl
       }
 
       // Get the new value of h ...
-      hnew = (yddnrm*hmax*hmax > 2.0) ? sqrt(2.0 / yddnrm) : sqrt(hg * hmax);
+      hnew = (yddnrm*hmax*hmax > 2.0) ? Kokkos::Experimental::sqrt(2.0 / yddnrm) : sqrt(hg * hmax);
 
       // test the stopping conditions.
       double hrat = hnew / hg;
@@ -828,7 +828,7 @@ void FixRxKokkos<DeviceType>::rkf45(const int neq, const double t_stop, double *
         err2 += wterr * wterr;
       }
 
-    double err = fmax( uround, sqrt( err2 / double(nspecies) ));
+    double err = fmax( uround, Kokkos::Experimental::sqrt( err2 / double(nspecies) ));
 
     // Accept the solution?
     if (err <= 1.0 || h <= h_min) {
@@ -840,7 +840,7 @@ void FixRxKokkos<DeviceType>::rkf45(const int neq, const double t_stop, double *
     }
 
     // Adjust h for the next step.
-    double hfac = hsafe * sqrt( sqrt( 1.0 / err ) );
+    double hfac = hsafe * Kokkos::Experimental::sqrt( sqrt( 1.0 / err ) );
 
     // Limit the adaption.
     hfac = fmax( hfac, 1.0 / adaption_limit );
@@ -914,7 +914,7 @@ int FixRxKokkos<DeviceType>::rhs_dense(double /*t*/, const double *y, double *dy
 
     for (int ispecies=0; ispecies<nspecies; ispecies++) {
       const double concentration = y[ispecies]/VDPD;
-      rxnRateLawForward *= pow( concentration, d_kineticsData.stoichReactants(jrxn,ispecies) );
+      rxnRateLawForward *= Kokkos::Experimental::pow( concentration, d_kineticsData.stoichReactants(jrxn,ispecies) );
       //rxnRateLawForward *= pow(concentration,stoichReactants[jrxn][ispecies]);
     }
     rxnRateLaw[jrxn] = rxnRateLawForward;
@@ -968,12 +968,12 @@ int FixRxKokkos<DeviceType>::rhs_sparse(double /*t*/, const double *y, double *d
                rxnRateLawForward *= powint( conc[k], inu(i,kk) );
          }
       } else {
-         rxnRateLawForward = kFor[i] * pow( conc[ nuk(i,0) ], nu(i,0) );
+         rxnRateLawForward = kFor[i] * Kokkos::Experimental::pow( conc[ nuk(i,0) ], nu(i,0) );
          for (int kk = 1; kk < maxReactants; ++kk) {
             const int k = nuk(i,kk);
             if (k == SparseKinetics_invalidIndex) break;
             //if (k != SparseKinetics_invalidIndex)
-               rxnRateLawForward *= pow( conc[k], nu(i,kk) );
+               rxnRateLawForward *= Kokkos::Experimental::pow( conc[k], nu(i,kk) );
          }
       }
 
@@ -1060,7 +1060,7 @@ int FixRxKokkos<DeviceType>::k_rhs_dense(double /*t*/, const VectorType& y, Vect
 
     for (int ispecies=0; ispecies<nspecies; ispecies++) {
       const double concentration = y[ispecies]/VDPD;
-      rxnRateLawForward *= pow( concentration, d_kineticsData.stoichReactants(jrxn,ispecies) );
+      rxnRateLawForward *= Kokkos::Experimental::pow( concentration, d_kineticsData.stoichReactants(jrxn,ispecies) );
       //rxnRateLawForward *= pow(concentration,stoichReactants[jrxn][ispecies]);
     }
     rxnRateLaw[jrxn] = rxnRateLawForward;
@@ -1115,12 +1115,12 @@ int FixRxKokkos<DeviceType>::k_rhs_sparse(double /*t*/, const VectorType& y, Vec
                rxnRateLawForward *= powint( conc[k], inu(i,kk) );
          }
       } else {
-         rxnRateLawForward = kFor[i] * pow( conc[ nuk(i,0) ], nu(i,0) );
+         rxnRateLawForward = kFor[i] * Kokkos::Experimental::pow( conc[ nuk(i,0) ], nu(i,0) );
          for (int kk = 1; kk < maxReactants; ++kk) {
             const int k = nuk(i,kk);
             if (k == SparseKinetics_invalidIndex) break;
             //if (k != SparseKinetics_invalidIndex)
-               rxnRateLawForward *= pow( conc[k], nu(i,kk) );
+               rxnRateLawForward *= Kokkos::Experimental::pow( conc[k], nu(i,kk) );
          }
       }
 
@@ -1196,7 +1196,7 @@ void FixRxKokkos<DeviceType>::operator()(SolverType, const int &i) const
       if (SolverType::setToZero)
         userData.kFor[irxn] = 0.0;
       else
-        userData.kFor[irxn] = Arr[irxn]*pow(theta,nArr[irxn])*exp(-Ea[irxn]/force->boltz/theta);
+        userData.kFor[irxn] = Arr[irxn]*pow(theta,nArr[irxn])*Kokkos::Experimental::exp(-Ea[irxn]/force->boltz/theta);
     }
 
     if (odeIntegrationFlag == ODE_LAMMPS_RK4)
@@ -1352,8 +1352,8 @@ void FixRxKokkos<DeviceType>::operator()(Tag_FixRxKokkos_solveSystems<ZERO_RATES
       else
       {
         userData.kFor[irxn] = d_kineticsData.Arr(irxn) *
-                               pow(theta, d_kineticsData.nArr(irxn)) *
-                               exp(-d_kineticsData.Ea(irxn) / boltz / theta);
+                               Kokkos::Experimental::pow(theta, d_kineticsData.nArr(irxn)) *
+                               Kokkos::Experimental::exp(-d_kineticsData.Ea(irxn) / boltz / theta);
       }
     }
 
@@ -1571,8 +1571,8 @@ void FixRxKokkos<DeviceType>::solve_reactions(const int /*vflag*/, const bool is
           else
           {
             userData.kFor[irxn] = d_kineticsData.Arr(irxn) *
-                                   pow(theta, d_kineticsData.nArr(irxn)) *
-                                   exp(-d_kineticsData.Ea(irxn) / boltz / theta);
+                                   Kokkos::Experimental::pow(theta, d_kineticsData.nArr(irxn)) *
+                                   Kokkos::Experimental::exp(-d_kineticsData.Ea(irxn) / boltz / theta);
           }
         }
 
@@ -1829,7 +1829,7 @@ void FixRxKokkos<DeviceType>::odeDiagnostics()
     if (diagnosticFrequency == 1) {
       double rms_per_ODE[numCounters];
       for (int i = 0; i < numCounters; ++i)
-        rms_per_ODE[i] = sqrt( sum_sq[i+numCounters] / nODEs );
+        rms_per_ODE[i] = Kokkos::Experimental::sqrt( sum_sq[i+numCounters] / nODEs );
 
       sprintf(smesg, "         RMS per ODE  : %-12.5g | %-12.5g ", rms_per_ODE[0], rms_per_ODE[1]);
       print_mesg(smesg);
@@ -1847,7 +1847,7 @@ void FixRxKokkos<DeviceType>::odeDiagnostics()
     if (comm->nprocs > 1) {
       double rms_per_proc[numCounters];
       for (int i = 0; i < numCounters; ++i)
-        rms_per_proc[i] = sqrt( sum_sq[i] / comm->nprocs );
+        rms_per_proc[i] = Kokkos::Experimental::sqrt( sum_sq[i] / comm->nprocs );
 
       sprintf(smesg, "         RMS per Proc : %-12.5g | %-12.5g | %-12.5g | %-12.5g", rms_per_proc[0], rms_per_proc[1], rms_per_proc[2], rms_per_proc[AtomSum]);
       print_mesg(smesg);
@@ -1924,8 +1924,8 @@ void FixRxKokkos<DeviceType>::operator()(Tag_FixRxKokkos_firstPairOperator<WT_FL
 
     if (rsq < cutsq_ij)
     {
-      const double rcut = sqrt( cutsq_ij );
-      double rij = sqrt(rsq);
+      const double rcut = Kokkos::Experimental::sqrt( cutsq_ij );
+      double rij = Kokkos::Experimental::sqrt(rsq);
       double ratio = rij/rcut;
 
       double wij = 0.0;
@@ -2100,8 +2100,8 @@ void FixRxKokkos<DeviceType>::computeLocalTemperature()
 
             if (rsq < cutsq_ij)
             {
-              const double rcut = sqrt( cutsq_ij );
-              double rij = sqrt(rsq);
+              const double rcut = Kokkos::Experimental::sqrt( cutsq_ij );
+              double rij = Kokkos::Experimental::sqrt(rsq);
               double ratio = rij/rcut;
 
               double wij = 0.0;

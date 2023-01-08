@@ -187,7 +187,7 @@ F_FLOAT PairZBLKokkos<DeviceType>::
 compute_fpair(const F_FLOAT& rsq, const int& i, const int&j, const int& itype, const int& jtype) const {
   (void) i;
   (void) j;
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   F_FLOAT fpair = dzbldr(r, itype, jtype);
 
   if (rsq > cut_innersq) {
@@ -208,7 +208,7 @@ F_FLOAT PairZBLKokkos<DeviceType>::
 compute_evdwl(const F_FLOAT& rsq, const int& i, const int&j, const int& itype, const int& jtype) const {
   (void) i;
   (void) j;
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   F_FLOAT evdwl = e_zbl(r, itype, jtype);
   evdwl += d_sw5(itype,jtype);
   if (rsq > cut_innersq) {
@@ -314,10 +314,10 @@ F_FLOAT PairZBLKokkos<DeviceType>::e_zbl(F_FLOAT r, int i, int j) const {
   const F_FLOAT zzeij = d_zze(i,j);
   const F_FLOAT rinv = 1.0/r;
 
-  F_FLOAT sum = c1*exp(-d1aij*r);
-  sum += c2*exp(-d2aij*r);
-  sum += c3*exp(-d3aij*r);
-  sum += c4*exp(-d4aij*r);
+  F_FLOAT sum = c1*Kokkos::Experimental::exp(-d1aij*r);
+  sum += c2*Kokkos::Experimental::exp(-d2aij*r);
+  sum += c3*Kokkos::Experimental::exp(-d3aij*r);
+  sum += c4*Kokkos::Experimental::exp(-d4aij*r);
 
   F_FLOAT result = zzeij*sum*rinv;
 
@@ -339,10 +339,10 @@ F_FLOAT PairZBLKokkos<DeviceType>::dzbldr(F_FLOAT r, int i, int j) const {
   const F_FLOAT zzeij = d_zze(i,j);
   const F_FLOAT rinv = 1.0/r;
 
-  const F_FLOAT e1 = exp(-d1aij*r);
-  const F_FLOAT e2 = exp(-d2aij*r);
-  const F_FLOAT e3 = exp(-d3aij*r);
-  const F_FLOAT e4 = exp(-d4aij*r);
+  const F_FLOAT e1 = Kokkos::Experimental::exp(-d1aij*r);
+  const F_FLOAT e2 = Kokkos::Experimental::exp(-d2aij*r);
+  const F_FLOAT e3 = Kokkos::Experimental::exp(-d3aij*r);
+  const F_FLOAT e4 = Kokkos::Experimental::exp(-d4aij*r);
 
   F_FLOAT sum = c1*e1;
   sum += c2*e2;
@@ -374,10 +374,10 @@ F_FLOAT PairZBLKokkos<DeviceType>::d2zbldr2(F_FLOAT r, int i, int j) const {
   const F_FLOAT zzeij = d_zze(i,j);
   const F_FLOAT rinv = 1.0/r;
 
-  const F_FLOAT e1 = exp(-d1aij*r);
-  const F_FLOAT e2 = exp(-d2aij*r);
-  const F_FLOAT e3 = exp(-d3aij*r);
-  const F_FLOAT e4 = exp(-d4aij*r);
+  const F_FLOAT e1 = Kokkos::Experimental::exp(-d1aij*r);
+  const F_FLOAT e2 = Kokkos::Experimental::exp(-d2aij*r);
+  const F_FLOAT e3 = Kokkos::Experimental::exp(-d3aij*r);
+  const F_FLOAT e4 = Kokkos::Experimental::exp(-d4aij*r);
 
   F_FLOAT sum = c1*e1;
   sum += c2*e2;

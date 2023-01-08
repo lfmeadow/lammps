@@ -496,14 +496,14 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxCompute<NEIGHFLAG,NEW
       r2inv = 1.0/rsq;
       r6inv = r2inv*r2inv*r2inv;
 
-      r = sqrt(rsq);
+      r = Kokkos::Experimental::sqrt(rsq);
       rCut2inv = 1.0/d_cutsq(itype,jtype);
       rCut6inv = rCut2inv*rCut2inv*rCut2inv;
-      rCut = sqrt(d_cutsq(itype,jtype));
+      rCut = Kokkos::Experimental::sqrt(d_cutsq(itype,jtype));
       rCutInv = 1.0/rCut;
 
       //
-      // A. Compute the exp-6 potential
+      // A. Compute the Kokkos::Experimental::exp-6 potential
       //
 
       // A1.  Get alpha, epsilon and rm for particle j
@@ -528,19 +528,19 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxCompute<NEIGHFLAG,NEW
       }
 
       // A2.  Apply Lorentz-Berthelot mixing rules for the i-j pair
-      alphaOld12_ij = sqrt(alphaOld1_i*alphaOld2_j);
+      alphaOld12_ij = Kokkos::Experimental::sqrt(alphaOld1_i*alphaOld2_j);
       rmOld12_ij = 0.5*(rmOld1_i + rmOld2_j);
-      epsilonOld12_ij = sqrt(epsilonOld1_i*epsilonOld2_j);
-      alphaOld21_ij = sqrt(alphaOld2_i*alphaOld1_j);
+      epsilonOld12_ij = Kokkos::Experimental::sqrt(epsilonOld1_i*epsilonOld2_j);
+      alphaOld21_ij = Kokkos::Experimental::sqrt(alphaOld2_i*alphaOld1_j);
       rmOld21_ij = 0.5*(rmOld2_i + rmOld1_j);
-      epsilonOld21_ij = sqrt(epsilonOld2_i*epsilonOld1_j);
+      epsilonOld21_ij = Kokkos::Experimental::sqrt(epsilonOld2_i*epsilonOld1_j);
 
-      alpha12_ij = sqrt(alpha1_i*alpha2_j);
+      alpha12_ij = Kokkos::Experimental::sqrt(alpha1_i*alpha2_j);
       rm12_ij = 0.5*(rm1_i + rm2_j);
-      epsilon12_ij = sqrt(epsilon1_i*epsilon2_j);
-      alpha21_ij = sqrt(alpha2_i*alpha1_j);
+      epsilon12_ij = Kokkos::Experimental::sqrt(epsilon1_i*epsilon2_j);
+      alpha21_ij = Kokkos::Experimental::sqrt(alpha2_i*alpha1_j);
       rm21_ij = 0.5*(rm2_i + rm1_j);
-      epsilon21_ij = sqrt(epsilon2_i*epsilon1_j);
+      epsilon21_ij = Kokkos::Experimental::sqrt(epsilon2_i*epsilon1_j);
 
       evdwlOldEXP6_12 = 0.0;
       evdwlOldEXP6_21 = 0.0;
@@ -632,9 +632,9 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxCompute<NEIGHFLAG,NEW
         }
 
         if (isite1 == isite2)
-          evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
+          evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
         else
-          evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
+          evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
 
         evdwlOld *= factor_lj;
 
@@ -716,8 +716,8 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxCompute<NEIGHFLAG,NEW
       //
       // Apply Mixing Rule to get the overall force for the CG pair
       //
-      if (isite1 == isite2) fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
-      else fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
+      if (isite1 == isite2) fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
+      else fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
 
       fx_i += delx*fpair;
       fy_i += dely*fpair;
@@ -728,8 +728,8 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxCompute<NEIGHFLAG,NEW
         a_f(j,2) -= delz*fpair;
       }
 
-      if (isite1 == isite2) evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
-      else evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
+      if (isite1 == isite2) evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
+      else evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
       evdwl *= factor_lj;
 
       uCGnew_i   += 0.5*evdwl;
@@ -870,14 +870,14 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxComputeNoAtomics<NEIG
       r2inv = 1.0/rsq;
       r6inv = r2inv*r2inv*r2inv;
 
-      r = sqrt(rsq);
+      r = Kokkos::Experimental::sqrt(rsq);
       rCut2inv = 1.0/d_cutsq(itype,jtype);
       rCut6inv = rCut2inv*rCut2inv*rCut2inv;
-      rCut = sqrt(d_cutsq(itype,jtype));
+      rCut = Kokkos::Experimental::sqrt(d_cutsq(itype,jtype));
       rCutInv = 1.0/rCut;
 
       //
-      // A. Compute the exp-6 potential
+      // A. Compute the Kokkos::Experimental::exp-6 potential
       //
 
       // A1.  Get alpha, epsilon and rm for particle j
@@ -902,19 +902,19 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxComputeNoAtomics<NEIG
       }
 
       // A2.  Apply Lorentz-Berthelot mixing rules for the i-j pair
-      alphaOld12_ij = sqrt(alphaOld1_i*alphaOld2_j);
+      alphaOld12_ij = Kokkos::Experimental::sqrt(alphaOld1_i*alphaOld2_j);
       rmOld12_ij = 0.5*(rmOld1_i + rmOld2_j);
-      epsilonOld12_ij = sqrt(epsilonOld1_i*epsilonOld2_j);
-      alphaOld21_ij = sqrt(alphaOld2_i*alphaOld1_j);
+      epsilonOld12_ij = Kokkos::Experimental::sqrt(epsilonOld1_i*epsilonOld2_j);
+      alphaOld21_ij = Kokkos::Experimental::sqrt(alphaOld2_i*alphaOld1_j);
       rmOld21_ij = 0.5*(rmOld2_i + rmOld1_j);
-      epsilonOld21_ij = sqrt(epsilonOld2_i*epsilonOld1_j);
+      epsilonOld21_ij = Kokkos::Experimental::sqrt(epsilonOld2_i*epsilonOld1_j);
 
-      alpha12_ij = sqrt(alpha1_i*alpha2_j);
+      alpha12_ij = Kokkos::Experimental::sqrt(alpha1_i*alpha2_j);
       rm12_ij = 0.5*(rm1_i + rm2_j);
-      epsilon12_ij = sqrt(epsilon1_i*epsilon2_j);
-      alpha21_ij = sqrt(alpha2_i*alpha1_j);
+      epsilon12_ij = Kokkos::Experimental::sqrt(epsilon1_i*epsilon2_j);
+      alpha21_ij = Kokkos::Experimental::sqrt(alpha2_i*alpha1_j);
       rm21_ij = 0.5*(rm2_i + rm1_j);
-      epsilon21_ij = sqrt(epsilon2_i*epsilon1_j);
+      epsilon21_ij = Kokkos::Experimental::sqrt(epsilon2_i*epsilon1_j);
 
       evdwlOldEXP6_12 = 0.0;
       evdwlOldEXP6_21 = 0.0;
@@ -1006,9 +1006,9 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxComputeNoAtomics<NEIG
         }
 
         if (isite1 == isite2)
-          evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
+          evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
         else
-          evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
+          evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
 
         evdwlOld *= factor_lj;
 
@@ -1090,8 +1090,8 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxComputeNoAtomics<NEIG
       //
       // Apply Mixing Rule to get the overall force for the CG pair
       //
-      if (isite1 == isite2) fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
-      else fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
+      if (isite1 == isite2) fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
+      else fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
 
       fx_i += delx*fpair;
       fy_i += dely*fpair;
@@ -1102,8 +1102,8 @@ void PairExp6rxKokkos<DeviceType>::operator()(TagPairExp6rxComputeNoAtomics<NEIG
         t_f(tid,j,2) -= delz*fpair;
       }
 
-      if (isite1 == isite2) evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
-      else evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
+      if (isite1 == isite2) evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
+      else evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
       evdwl *= factor_lj;
 
       uCGnew_i += 0.5*evdwl;
@@ -1200,7 +1200,7 @@ void PairExp6rxKokkos<DeviceType>::vectorized_operator(const int &ii, EV_FLOAT& 
   const double cutsq_type11 = d_cutsq(1,1);
   const double rCut2inv_type11 = 1.0/ cutsq_type11;
   const double rCut6inv_type11 = rCut2inv_type11*rCut2inv_type11*rCut2inv_type11;
-  const double rCut_type11 = sqrt( cutsq_type11 );
+  const double rCut_type11 = Kokkos::Experimental::sqrt( cutsq_type11 );
   const double rCutInv_type11 = 1.0/rCut_type11;
 
   // Do error testing locally.
@@ -1285,14 +1285,14 @@ void PairExp6rxKokkos<DeviceType>::vectorized_operator(const int &ii, EV_FLOAT& 
         const double r2inv = 1.0/rsq;
         const double r6inv = r2inv*r2inv*r2inv;
 
-        const double r = sqrt(rsq);
+        const double r = Kokkos::Experimental::sqrt(rsq);
         const double rCut2inv = (OneType) ? rCut2inv_type11 : (1.0/ cutsq_j[jlane]);
         const double rCut6inv = (OneType) ? rCut6inv_type11 : (rCut2inv*rCut2inv*rCut2inv);
-        const double rCut =     (OneType) ? rCut_type11     : (sqrt( cutsq_j[jlane] ));
+        const double rCut =     (OneType) ? rCut_type11     : (Kokkos::Experimental::sqrt( cutsq_j[jlane] ));
         const double rCutInv =  (OneType) ? rCutInv_type11  : (1.0/rCut);
 
         //
-        // A. Compute the exp-6 potential
+        // A. Compute the Kokkos::Experimental::exp-6 potential
         //
 
         // A1.  Get alpha, epsilon and rm for particle j
@@ -1315,19 +1315,19 @@ void PairExp6rxKokkos<DeviceType>::vectorized_operator(const int &ii, EV_FLOAT& 
         const double mixWtSite2old_j = PairExp6ParamData.mixWtSite2old[j];
 
         // A2.  Apply Lorentz-Berthelot mixing rules for the i-j pair
-        const double alphaOld12_ij = sqrt(alphaOld1_i*alphaOld2_j);
+        const double alphaOld12_ij = Kokkos::Experimental::sqrt(alphaOld1_i*alphaOld2_j);
         const double rmOld12_ij = 0.5*(rmOld1_i + rmOld2_j);
-        const double epsilonOld12_ij = sqrt(epsilonOld1_i*epsilonOld2_j);
-        const double alphaOld21_ij = sqrt(alphaOld2_i*alphaOld1_j);
+        const double epsilonOld12_ij = Kokkos::Experimental::sqrt(epsilonOld1_i*epsilonOld2_j);
+        const double alphaOld21_ij = Kokkos::Experimental::sqrt(alphaOld2_i*alphaOld1_j);
         const double rmOld21_ij = 0.5*(rmOld2_i + rmOld1_j);
-        const double epsilonOld21_ij = sqrt(epsilonOld2_i*epsilonOld1_j);
+        const double epsilonOld21_ij = Kokkos::Experimental::sqrt(epsilonOld2_i*epsilonOld1_j);
 
-        const double alpha12_ij = sqrt(alpha1_i*alpha2_j);
+        const double alpha12_ij = Kokkos::Experimental::sqrt(alpha1_i*alpha2_j);
         const double rm12_ij = 0.5*(rm1_i + rm2_j);
-        const double epsilon12_ij = sqrt(epsilon1_i*epsilon2_j);
-        const double alpha21_ij = sqrt(alpha2_i*alpha1_j);
+        const double epsilon12_ij = Kokkos::Experimental::sqrt(epsilon1_i*epsilon2_j);
+        const double alpha21_ij = Kokkos::Experimental::sqrt(alpha2_i*alpha1_j);
         const double rm21_ij = 0.5*(rm2_i + rm1_j);
-        const double epsilon21_ij = sqrt(epsilon2_i*epsilon1_j);
+        const double epsilon21_ij = Kokkos::Experimental::sqrt(epsilon2_i*epsilon1_j);
 
         double evdwlOldEXP6_12 = 0.0;
         double evdwlOldEXP6_21 = 0.0;
@@ -1421,9 +1421,9 @@ void PairExp6rxKokkos<DeviceType>::vectorized_operator(const int &ii, EV_FLOAT& 
 
           double evdwlOld;
           if (Site1EqSite2)
-            evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
+            evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12;
           else
-            evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
+            evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwlOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*evdwlOldEXP6_21;
 
           evdwlOld *= factor_lj;
 
@@ -1507,15 +1507,15 @@ void PairExp6rxKokkos<DeviceType>::vectorized_operator(const int &ii, EV_FLOAT& 
         //
         double fpair;
         if (Site1EqSite2)
-          fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
+          fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12;
         else
-          fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
+          fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpairOldEXP6_12 + sqrt(mixWtSite2old_i*mixWtSite1old_j)*fpairOldEXP6_21;
 
         double evdwl;
         if (Site1EqSite2)
-          evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
+          evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12;
         else
-          evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
+          evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwlEXP6_12 + sqrt(mixWtSite2_i*mixWtSite1_j)*evdwlEXP6_21;
 
         evdwl *= factor_lj;
 
@@ -1933,8 +1933,8 @@ void PairExp6rxKokkos<DeviceType>::getMixingWeights(int id,double &epsilon1,doub
 
         rmij = (rmi+rmj)/2.0;
         rm3ij = rmij*rmij*rmij;
-        epsilonij = sqrt(epsiloni*epsilonj);
-        alphaij = sqrt(alphai*alphaj);
+        epsilonij = Kokkos::Experimental::sqrt(epsiloni*epsilonj);
+        alphaij = Kokkos::Experimental::sqrt(alphai*alphaj);
 
         if (fractionOFAold > 0.0) {
           rm3_old += xMolei_old*xMolej_old*rm3ij;
@@ -2277,8 +2277,8 @@ void PairExp6rxKokkos<DeviceType>::getMixingWeightsVect(const int np_total, int 
 
         const double rmij = (rmi+rmj)/2.0;
         const double rm3ij = rmij*rmij*rmij;
-        const double epsilonij = sqrt(epsiloni*epsilonj);
-        const double alphaij = sqrt(alphai*alphaj);
+        const double epsilonij = Kokkos::Experimental::sqrt(epsiloni*epsilonj);
+        const double alphaij = Kokkos::Experimental::sqrt(alphai*alphaj);
 
         #ifdef KOKKOS_ENABLE_PRAGMA_IVDEP
         #pragma ivdep
@@ -2481,19 +2481,19 @@ void PairExp6rxKokkos<DeviceType>::exponentScaling(double phi, double &epsilon, 
   double powfuch;
 
   if (exponentEpsilon < 0.0) {
-    powfuch = pow(phi,-exponentEpsilon);
+    powfuch = Kokkos::Experimental::pow(phi,-exponentEpsilon);
     if (powfuch<MY_EPSILON) epsilon = 0.0;
     else epsilon *= 1.0/powfuch;
   } else {
-    epsilon *= pow(phi,exponentEpsilon);
+    epsilon *= Kokkos::Experimental::pow(phi,exponentEpsilon);
   }
 
   if (exponentR < 0.0) {
-    powfuch = pow(phi,-exponentR);
+    powfuch = Kokkos::Experimental::pow(phi,-exponentR);
     if (powfuch<MY_EPSILON) rm = 0.0;
     else rm *= 1.0/powfuch;
   } else {
-    rm *= pow(phi,exponentR);
+    rm *= Kokkos::Experimental::pow(phi,exponentR);
   }
 }
 
@@ -2524,7 +2524,7 @@ double PairExp6rxKokkos<DeviceType>::func_rin(const double &alpha) const
   const double a = 3.7682065;
   const double b = -1.4308614;
 
-  function = a+b*sqrt(alpha);
+  function = a+b*Kokkos::Experimental::sqrt(alpha);
   function = expValue(function);
 
   return function;
@@ -2538,7 +2538,7 @@ double PairExp6rxKokkos<DeviceType>::expValue(double value) const
 {
   double returnValue;
   if (value < DBL_MIN_EXP) returnValue = 0.0;
-  else returnValue = exp(value);
+  else returnValue = Kokkos::Experimental::exp(value);
 
   return returnValue;
 }

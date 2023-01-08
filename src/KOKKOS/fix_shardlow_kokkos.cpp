@@ -300,7 +300,7 @@ void FixShardlowKokkos<DeviceType>::ssa_update_dpd(
         else Kokkos::atomic_increment(&(d_counters(1, 1)));
         Kokkos::atomic_increment(&(d_counters(1, 2)));
 #endif
-        double r = sqrt(rsq);
+        double r = Kokkos::Experimental::sqrt(rsq);
         double rinv = 1.0/r;
         double delx_rinv = delx*rinv;
         double dely_rinv = dely*rinv;
@@ -446,7 +446,7 @@ void FixShardlowKokkos<DeviceType>::ssa_update_dpde(
         Kokkos::atomic_increment(&(d_counters(1, 2)));
 #endif
 
-        double r = sqrt(rsq);
+        double r = Kokkos::Experimental::sqrt(rsq);
         double rinv = 1.0/r;
         double delx_rinv = delx*rinv;
         double dely_rinv = dely*rinv;
@@ -560,7 +560,7 @@ void FixShardlowKokkos<DeviceType>::initial_integrate(int /*vflag*/)
 
   copymode = 1;
 
-  dtsqrt = sqrt(update->dt);
+  dtsqrt = Kokkos::Experimental::sqrt(update->dt);
 
   NPairSSAKokkos<DeviceType> *np_ssa = dynamic_cast<NPairSSAKokkos<DeviceType>*>(list->np);
   if (!np_ssa) error->one(FLERR, "NPair wasn't a NPairSSAKokkos object");

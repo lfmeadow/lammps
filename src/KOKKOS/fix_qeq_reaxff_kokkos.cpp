@@ -140,7 +140,7 @@ void FixQEqReaxFFKokkos<DeviceType>::init_shielding_k()
 
   for (i = 1; i <= ntypes; ++i)
     for (j = 1; j <= ntypes; ++j)
-      k_shield.h_view(i,j) = pow(gamma[i] * gamma[j], -1.5);
+      k_shield.h_view(i,j) = Kokkos::Experimental::pow(gamma[i] * gamma[j], -1.5);
 
   k_shield.template modify<LMPHostType>();
   k_shield.template sync<DeviceType>();
@@ -453,7 +453,7 @@ void FixQEqReaxFFKokkos<DeviceType>::compute_h_item(int ii, int &m_fill, const b
       if (rsq > cutsq) continue;
 
       if (final) {
-        const F_FLOAT r = sqrt(rsq);
+        const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
         d_jlist(m_fill) = j;
         const F_FLOAT shldij = d_shield(itype,jtype);
         d_val(m_fill) = calculate_H_k(r,shldij);
@@ -639,7 +639,7 @@ void FixQEqReaxFFKokkos<DeviceType>::compute_h_team(
                       if (valid) {
                         s_jlist(team.team_rank(), idx) = j;
                         s_jtype(team.team_rank(), idx) = jtype;
-                        s_r(team.team_rank(), idx) = sqrt(rsq);
+                        s_r(team.team_rank(), idx) = Kokkos::Experimental::sqrt(rsq);
                         m_fill++;
                       }
                     }
@@ -745,8 +745,8 @@ int FixQEqReaxFFKokkos<DeviceType>::cg_solve()
   Kokkos::parallel_reduce(Kokkos::RangePolicy<DeviceType,TagQEqNorm1>(0,nn),*this,my_norm);
   F_FLOAT2 norm_sqr;
   MPI_Allreduce(&my_norm.v, &norm_sqr.v, 2, MPI_DOUBLE, MPI_SUM, world);
-  b_norm.v[0] = sqrt(norm_sqr.v[0]);
-  b_norm.v[1] = sqrt(norm_sqr.v[1]);
+  b_norm.v[0] = Kokkos::Experimental::sqrt(norm_sqr.v[0]);
+  b_norm.v[1] = Kokkos::Experimental::sqrt(norm_sqr.v[1]);
 
   // sig_new = parallel_dot(r, d, nn);
   F_FLOAT2 my_dot;
@@ -760,9 +760,9 @@ int FixQEqReaxFFKokkos<DeviceType>::cg_solve()
   int loop;
   for (loop = 1; (loop < imax); loop++) {
     if (!(converged & 1))
-      residual[0] = sqrt(sig_new.v[0]) / b_norm.v[0];
+      residual[0] = Kokkos::Experimental::sqrt(sig_new.v[0]) / b_norm.v[0];
     if (!(converged & 2))
-      residual[1] = sqrt(sig_new.v[1]) / b_norm.v[1];
+      residual[1] = Kokkos::Experimental::sqrt(sig_new.v[1]) / b_norm.v[1];
     converged = static_cast<int>(residual[0] <= tolerance) | (static_cast<int>(residual[1] <= tolerance) << 1);
 
     if (converged == 3) {
@@ -818,7 +818,7 @@ int FixQEqReaxFFKokkos<DeviceType>::cg_solve()
     error->warning(FLERR,fmt::format("Fix qeq/reaxff/kk cg_solve convergence "
                                      "failed after {} iterations at step {}: "
                                      "({}, {})", loop, update->ntimestep,
-                                     (sqrt(sig_new.v[0])/b_norm.v[0]), (sqrt(sig_new.v[1])/b_norm.v[1])));
+                                     (Kokkos::Experimental::sqrt(sig_new.v[0])/b_norm.v[0]), (sqrt(sig_new.v[1])/b_norm.v[1])));
 
   return loop;
 }

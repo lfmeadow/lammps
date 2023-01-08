@@ -629,23 +629,23 @@ void PairReaxFFKokkos<DeviceType>::LR_vdW_Coulomb(int i, int j, double r_ij, LR_
   /*vdWaals Calculations*/
   if (api->system->reax_param.gp.vdw_type==1 || api->system->reax_param.gp.vdw_type==3)
     { // shielding
-      powr_vdW1 = pow(r_ij, p_vdW1);
-      powgi_vdW1 = pow(1.0 / twbp->gamma_w, p_vdW1);
+      powr_vdW1 = Kokkos::Experimental::pow(r_ij, p_vdW1);
+      powgi_vdW1 = Kokkos::Experimental::pow(1.0 / twbp->gamma_w, p_vdW1);
 
-      fn13 = pow(powr_vdW1 + powgi_vdW1, p_vdW1i);
-      exp1 = exp(twbp->alpha * (1.0 - fn13 / twbp->r_vdW));
-      exp2 = exp(0.5 * twbp->alpha * (1.0 - fn13 / twbp->r_vdW));
+      fn13 = Kokkos::Experimental::pow(powr_vdW1 + powgi_vdW1, p_vdW1i);
+      exp1 = Kokkos::Experimental::exp(twbp->alpha * (1.0 - fn13 / twbp->r_vdW));
+      exp2 = Kokkos::Experimental::exp(0.5 * twbp->alpha * (1.0 - fn13 / twbp->r_vdW));
 
       lr->e_vdW = Tap * twbp->D * (exp1 - 2.0 * exp2);
 
-      dfn13 = pow(powr_vdW1 + powgi_vdW1, p_vdW1i-1.0) * pow(r_ij, p_vdW1-2.0);
+      dfn13 = Kokkos::Experimental::pow(powr_vdW1 + powgi_vdW1, p_vdW1i-1.0) * Kokkos::Experimental::pow(r_ij, p_vdW1-2.0);
 
       lr->CEvd = dTap * twbp->D * (exp1 - 2.0 * exp2) -
         Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) * dfn13;
     }
   else { // no shielding
-    exp1 = exp(twbp->alpha * (1.0 - r_ij / twbp->r_vdW));
-    exp2 = exp(0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW));
+    exp1 = Kokkos::Experimental::exp(twbp->alpha * (1.0 - r_ij / twbp->r_vdW));
+    exp2 = Kokkos::Experimental::exp(0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW));
 
     lr->e_vdW = Tap * twbp->D * (exp1 - 2.0 * exp2);
     lr->CEvd = dTap * twbp->D * (exp1 - 2.0 * exp2) -
@@ -654,7 +654,7 @@ void PairReaxFFKokkos<DeviceType>::LR_vdW_Coulomb(int i, int j, double r_ij, LR_
 
   if (api->system->reax_param.gp.vdw_type==2 || api->system->reax_param.gp.vdw_type==3)
     { // inner wall
-      e_core = twbp->ecore * exp(twbp->acore * (1.0-(r_ij/twbp->rcore)));
+      e_core = twbp->ecore * Kokkos::Experimental::exp(twbp->acore * (1.0-(r_ij/twbp->rcore)));
       lr->e_vdW += Tap * e_core;
 
       de_core = -(twbp->acore/twbp->rcore) * e_core;
@@ -1195,7 +1195,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeLJCoulomb<NEIGHF
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq > cut_nbsq) continue;
-    const F_FLOAT rij = sqrt(rsq);
+    const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
 
     // LJ energy/force
     F_FLOAT Tap = d_tap[7] * rij + d_tap[6];
@@ -1221,20 +1221,20 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeLJCoulomb<NEIGHF
     // shielding
     if (vdwflag == 1 || vdwflag == 3) {
       F_FLOAT tmp_var;
-      tmp_var = pow(rij,gp[28]-2.0);
+      tmp_var = Kokkos::Experimental::pow(rij,gp[28]-2.0);
       powr_vdw = tmp_var*rij*rij;
-      powgi_vdw = pow(1.0/gamma_w,gp[28]);
-      dfn13 = pow(powr_vdw+powgi_vdw,1.0/gp[28]-1.0);
+      powgi_vdw = Kokkos::Experimental::pow(1.0/gamma_w,gp[28]);
+      dfn13 = Kokkos::Experimental::pow(powr_vdw+powgi_vdw,1.0/gp[28]-1.0);
       fn13  = dfn13*(powr_vdw+powgi_vdw);
       dfn13 = dfn13*tmp_var;
 
-      exp2 = exp(0.5*alpha*(1.0-fn13/r_vdw));
+      exp2 = Kokkos::Experimental::exp(0.5*alpha*(1.0-fn13/r_vdw));
       exp1 = exp2*exp2;
       etmp = epsilon*(exp1-2.0*exp2);
       evdwl = Tap*etmp;
       fvdwl = dTap*etmp-Tap*epsilon*(alpha/r_vdw)*(exp1-exp2)*dfn13;
     } else {
-      exp2 = exp(0.5*alpha*(1.0-rij/r_vdw));
+      exp2 = Kokkos::Experimental::exp(0.5*alpha*(1.0-rij/r_vdw));
       exp1 = exp2*exp2;
       etmp = epsilon*(exp1-2.0*exp2);
       evdwl = Tap*etmp;
@@ -1245,7 +1245,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeLJCoulomb<NEIGHF
       const F_FLOAT ecore = paramstwbp(itype,jtype).ecore;
       const F_FLOAT acore = paramstwbp(itype,jtype).acore;
       const F_FLOAT rcore = paramstwbp(itype,jtype).rcore;
-      const F_FLOAT e_core = ecore*exp(acore*(1.0-(rij/rcore)));
+      const F_FLOAT e_core = ecore*Kokkos::Experimental::exp(acore*(1.0-(rij/rcore)));
       const F_FLOAT de_core = -(acore/rcore)*e_core;
       evdwl += Tap*e_core;
       fvdwl += dTap*e_core+Tap*de_core/rij;
@@ -1281,8 +1281,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeLJCoulomb<NEIGHF
 
       if (rij <= xcut) {
         const F_FLOAT d = rij / xcut;
-        const F_FLOAT bond_softness = gp[34] * pow( d, 3.0 )
-                                    * pow( 1.0 - d, 6.0 );
+        const F_FLOAT bond_softness = gp[34] * Kokkos::Experimental::pow( d, 3.0 )
+                                    * Kokkos::Experimental::pow( 1.0 - d, 6.0 );
 
         if (bond_softness > 0.0) {
           /* Coulombic energy contribution */
@@ -1296,8 +1296,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeLJCoulomb<NEIGHF
           /* forces contribution */
           F_FLOAT d_bond_softness;
           d_bond_softness = gp[34]
-                          * 3.0 / xcut * pow( d, 2.0 )
-                          * pow( 1.0 - d, 5.0 ) * (1.0 - 3.0 * d);
+                          * 3.0 / xcut * Kokkos::Experimental::pow( d, 2.0 )
+                          * Kokkos::Experimental::pow( 1.0 - d, 5.0 ) * (1.0 - 3.0 * d);
           d_bond_softness = -0.5 * d_bond_softness
                           * SQR( effpot_diff );
           d_bond_softness = KCALpMOL_to_EV * d_bond_softness
@@ -1387,7 +1387,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTabulatedLJCoulo
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq > cut_nbsq) continue;
-    const F_FLOAT rij = sqrt(rsq);
+    const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
 
     const int tmin  = MIN(itype, jtype);
     const int tmax  = MAX(itype, jtype);
@@ -1428,8 +1428,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTabulatedLJCoulo
 
       if (rij <= xcut) {
         const F_FLOAT d = rij / xcut;
-        const F_FLOAT bond_softness = gp[34] * pow( d, 3.0 )
-                                    * pow( 1.0 - d, 6.0 );
+        const F_FLOAT bond_softness = gp[34] * Kokkos::Experimental::pow( d, 3.0 )
+                                    * Kokkos::Experimental::pow( 1.0 - d, 6.0 );
 
         if (bond_softness > 0.0) {
           /* Coulombic energy contribution */
@@ -1443,8 +1443,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTabulatedLJCoulo
           /* forces contribution */
           F_FLOAT d_bond_softness;
           d_bond_softness = gp[34]
-                          * 3.0 / xcut * pow( d, 2.0 )
-                          * pow( 1.0 - d, 5.0 ) * (1.0 - 3.0 * d);
+                          * 3.0 / xcut * Kokkos::Experimental::pow( d, 2.0 )
+                          * Kokkos::Experimental::pow( 1.0 - d, 5.0 ) * (1.0 - 3.0 * d);
           d_bond_softness = -0.5 * d_bond_softness
                           * SQR( effpot_diff );
           d_bond_softness = KCALpMOL_to_EV * d_bond_softness
@@ -1660,7 +1660,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBuildListsHalfBlocking<
       if (rsq > cut_bosq) continue;
 
       // bond_list
-      const F_FLOAT rij = sqrt(rsq);
+      const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
       const F_FLOAT p_bo2 = paramstwbp(itype,jtype).p_bo2;
       const F_FLOAT p_bo4 = paramstwbp(itype,jtype).p_bo4;
       const F_FLOAT p_bo6 = paramstwbp(itype,jtype).p_bo6;
@@ -1806,7 +1806,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBuildListsHalfBlockingP
       if (rsq > cut_bosq) continue;
 
       // bond_list
-      const F_FLOAT rij = sqrt(rsq);
+      const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
       const F_FLOAT p_bo2 = paramstwbp(itype,jtype).p_bo2;
       const F_FLOAT p_bo4 = paramstwbp(itype,jtype).p_bo4;
       const F_FLOAT p_bo6 = paramstwbp(itype,jtype).p_bo6;
@@ -1875,7 +1875,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBuildListsHalfPreview<N
     if (rsq > cut_bosq) continue;
 
     // bond_list
-    const F_FLOAT rij = sqrt(rsq);
+    const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT p_bo2 = paramstwbp(itype,jtype).p_bo2;
     const F_FLOAT p_bo4 = paramstwbp(itype,jtype).p_bo4;
     const F_FLOAT p_bo6 = paramstwbp(itype,jtype).p_bo6;
@@ -2002,7 +2002,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBuildListsFull, const i
     const F_FLOAT rsq_inv = 1.0 / rsq;
 
     // bond_list
-    const F_FLOAT rij = sqrt(rsq);
+    const F_FLOAT rij = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT p_bo2 = paramstwbp(itype,jtype).p_bo2;
     const F_FLOAT p_bo4 = paramstwbp(itype,jtype).p_bo4;
     const F_FLOAT p_bo6 = paramstwbp(itype,jtype).p_bo6;
@@ -2061,18 +2061,18 @@ void PairReaxFFKokkos<DeviceType>::compute_bo(F_FLOAT rij, int itype, int jtype,
   const F_FLOAT r_pi2 = paramstwbp(itype,jtype).r_pi2;
 
   if (paramssing(itype).r_s > 0.0  && paramssing(jtype).r_s > 0.0) {
-    C12 = p_bo1 * ((p_bo2 != 0) ? (pow(rij/r_s,p_bo2)) : 1.0);
-    BO_s = (1.0+bo_cut)*exp(C12);
+    C12 = p_bo1 * ((p_bo2 != 0) ? (Kokkos::Experimental::pow(rij/r_s,p_bo2)) : 1.0);
+    BO_s = (1.0+bo_cut)*Kokkos::Experimental::exp(C12);
   } else BO_s = C12 = 0.0;
 
   if (paramssing(itype).r_pi > 0.0  && paramssing(jtype).r_pi > 0.0) {
-    C34 = p_bo3 * ((p_bo4 != 0) ? (pow(rij/r_pi,p_bo4)) : 1.0);
-    BO_pi = exp(C34);
+    C34 = p_bo3 * ((p_bo4 != 0) ? (Kokkos::Experimental::pow(rij/r_pi,p_bo4)) : 1.0);
+    BO_pi = Kokkos::Experimental::exp(C34);
   } else BO_pi = C34 = 0.0;
 
   if (paramssing(itype).r_pi2 > 0.0  && paramssing(jtype).r_pi2 > 0.0) {
-    C56 = p_bo5 * ((p_bo6 != 0) ? (pow(rij/r_pi2,p_bo6)) : 1.0);
-    BO_pi2 = exp(C56);
+    C56 = p_bo5 * ((p_bo6 != 0) ? (Kokkos::Experimental::pow(rij/r_pi2,p_bo6)) : 1.0);
+    BO_pi2 = Kokkos::Experimental::exp(C56);
   } else BO_pi2 = C56 = 0.0;
 
 }
@@ -2141,10 +2141,10 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBondOrder2, const int &
       d_C4dbopi2(i,j_index) = 0.0;
     } else {
       if (ovc >= 0.001) {
-        exp_p1i = exp(-p_boc1 * d_Deltap[i]);
-        exp_p2i = exp(-p_boc2 * d_Deltap[i]);
-        exp_p1j = exp(-p_boc1 * d_Deltap[j]);
-        exp_p2j = exp(-p_boc2 * d_Deltap[j]);
+        exp_p1i = Kokkos::Experimental::exp(-p_boc1 * d_Deltap[i]);
+        exp_p2i = Kokkos::Experimental::exp(-p_boc2 * d_Deltap[i]);
+        exp_p1j = Kokkos::Experimental::exp(-p_boc1 * d_Deltap[j]);
+        exp_p2j = Kokkos::Experimental::exp(-p_boc2 * d_Deltap[j]);
 
         f2 = exp_p1i + exp_p1j;
         f3 = -1.0/p_boc2*log(0.5*(exp_p2i+exp_p2j));
@@ -2164,8 +2164,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBondOrder2, const int &
       }
 
       if (v13cor >= 0.001) {
-        exp_f4 =exp(-(p_boc4*(d_BO(i,j_index)*d_BO(i,j_index))-d_Deltap_boc[i])*p_boc3+p_boc5);
-        exp_f5 =exp(-(p_boc4*(d_BO(i,j_index)*d_BO(i,j_index))-d_Deltap_boc[j])*p_boc3+p_boc5);
+        exp_f4 =Kokkos::Experimental::exp(-(p_boc4*(d_BO(i,j_index)*d_BO(i,j_index))-d_Deltap_boc[i])*p_boc3+p_boc5);
+        exp_f5 =Kokkos::Experimental::exp(-(p_boc4*(d_BO(i,j_index)*d_BO(i,j_index))-d_Deltap_boc[j])*p_boc3+p_boc5);
         f4 = 1. / (1. + exp_f4);
         f5 = 1. / (1. + exp_f5);
         f4f5 = f4 * f5;
@@ -2240,7 +2240,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxBondOrder3, const int &
   d_Delta_boc[i] = d_total_bo[i] - paramssing(itype).valency_boc;
 
   const F_FLOAT vlpex = Delta_e - 2.0 * (int)(Delta_e/2.0);
-  const F_FLOAT explp1 = exp(-gp[15] * SQR(2.0 + vlpex));
+  const F_FLOAT explp1 = Kokkos::Experimental::exp(-gp[15] * SQR(2.0 + vlpex));
   const F_FLOAT nlp = explp1 - (int)(Delta_e / 2.0);
   d_Delta_lp[i] = paramssing(itype).nlp_opt - nlp;
   const F_FLOAT Clp = 2.0 * gp[15] * explp1 * (2.0 + vlpex);
@@ -2324,7 +2324,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeMulti2<NEIGHFLAG
 
   // lone pair
   const F_FLOAT p_lp2 = paramssing(itype).p_lp2;
-  const F_FLOAT expvd2 = exp(-75 * d_Delta_lp[i]);
+  const F_FLOAT expvd2 = Kokkos::Experimental::exp(-75 * d_Delta_lp[i]);
   const F_FLOAT inv_expvd2 = 1.0 / (1.0+expvd2);
 
   int numbonds = d_bo_num[i];
@@ -2343,11 +2343,11 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeMulti2<NEIGHFLAG
   //if (eflag_atom) this->template e_tally<NEIGHFLAG>(ev,i,i,e_lp);
 
   // over coordination
-  const F_FLOAT exp_ovun1 = p_ovun3 * exp(p_ovun4 * d_sum_ovun(i,2));
+  const F_FLOAT exp_ovun1 = p_ovun3 * Kokkos::Experimental::exp(p_ovun4 * d_sum_ovun(i,2));
   const F_FLOAT inv_exp_ovun1 = 1.0 / (1 + exp_ovun1);
   const F_FLOAT Delta_lpcorr  = d_Delta[i] - (dfvl * d_Delta_lp_temp[i]) * inv_exp_ovun1;
 
-  const F_FLOAT exp_ovun2 = exp(p_ovun2 * Delta_lpcorr);
+  const F_FLOAT exp_ovun2 = Kokkos::Experimental::exp(p_ovun2 * Delta_lpcorr);
   const F_FLOAT inv_exp_ovun2 = 1.0 / (1.0 + exp_ovun2);
   const F_FLOAT DlpVi = 1.0 / (Delta_lpcorr + val_i + 1e-8);
 
@@ -2366,8 +2366,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeMulti2<NEIGHFLAG
   // under coordination
 
   const F_FLOAT exp_ovun2n = 1.0 / exp_ovun2;
-  const F_FLOAT exp_ovun6 = exp(p_ovun6 * Delta_lpcorr);
-  const F_FLOAT exp_ovun8 = p_ovun7 * exp(p_ovun8 * d_sum_ovun(i,2));
+  const F_FLOAT exp_ovun6 = Kokkos::Experimental::exp(p_ovun6 * Delta_lpcorr);
+  const F_FLOAT exp_ovun8 = p_ovun7 * Kokkos::Experimental::exp(p_ovun8 * d_sum_ovun(i,2));
   const F_FLOAT inv_exp_ovun2n = 1.0 / (1.0 + exp_ovun2n);
   const F_FLOAT inv_exp_ovun8 = 1.0 / (1.0 + exp_ovun8);
 
@@ -2410,11 +2410,11 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeMulti2<NEIGHFLAG
     // multibody lone pair: correction for C2
     if (p_lp3 > 0.001 && imass == 12.0 && jmass == 12.0) {
       const F_FLOAT Di = d_Delta[i];
-      const F_FLOAT vov3 = d_BO(i,j_index) - Di - 0.040*pow(Di,4.0);
+      const F_FLOAT vov3 = d_BO(i,j_index) - Di - 0.040*Kokkos::Experimental::pow(Di,4.0);
       if (vov3 > 3.0) {
         const F_FLOAT e_lph = p_lp3 * (vov3-3.0)*(vov3-3.0);
         const F_FLOAT deahu2dbo = 2.0 * p_lp3 * (vov3 - 3.0);
-        const F_FLOAT deahu2dsbo = 2.0 * p_lp3 * (vov3 - 3.0) * (-1.0 - 0.16 * pow(Di,3.0));
+        const F_FLOAT deahu2dsbo = 2.0 * p_lp3 * (vov3 - 3.0) * (-1.0 - 0.16 * Kokkos::Experimental::pow(Di,3.0));
         d_Cdbo(i,j_index) += deahu2dbo;
         CdDelta_i += deahu2dsbo;
 
@@ -2517,14 +2517,14 @@ void PairReaxFFKokkos<DeviceType>::compute_angular_sbo(int i, int itype, int j_s
     F_FLOAT temp = SQR(bo_ij);
     temp *= temp;
     temp *= temp;
-    prod_SBO *= exp(-temp);
+    prod_SBO *= Kokkos::Experimental::exp(-temp);
   }
 
   F_FLOAT vlpadj;
 
   const F_FLOAT Delta_e = d_total_bo[i] - paramssing(itype).valency_e;
   const F_FLOAT vlpex = Delta_e - 2.0 * (int)(Delta_e/2.0);
-  const F_FLOAT explp1 = exp(-gp[15] * SQR(2.0 + vlpex));
+  const F_FLOAT explp1 = Kokkos::Experimental::exp(-gp[15] * SQR(2.0 + vlpex));
   const F_FLOAT nlp = explp1 - (int)(Delta_e / 2.0);
   if (vlpex >= 0.0) {
     vlpadj = 0.0;
@@ -2541,11 +2541,11 @@ void PairReaxFFKokkos<DeviceType>::compute_angular_sbo(int i, int itype, int j_s
     SBO2 = 0.0;
     CSBO2 = 0.0;
   } else if (SBO > 0.0 && SBO <= 1.0) {
-    SBO2 = pow(SBO, p_val9);
-    CSBO2 = p_val9 * pow(SBO, p_val9 - 1.0);
+    SBO2 = Kokkos::Experimental::pow(SBO, p_val9);
+    CSBO2 = p_val9 * Kokkos::Experimental::pow(SBO, p_val9 - 1.0);
   } else if (SBO > 1.0 && SBO < 2.0) {
-    SBO2 = 2.0 - pow(2.0-SBO, p_val9);
-    CSBO2 = p_val9 * pow(2.0 - SBO, p_val9 - 1.0);
+    SBO2 = 2.0 - Kokkos::Experimental::pow(2.0-SBO, p_val9);
+    CSBO2 = p_val9 * Kokkos::Experimental::pow(2.0 - SBO, p_val9 - 1.0);
   } else {
     SBO2 = 2.0;
     CSBO2 = 0.0;
@@ -2776,7 +2776,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   dSBO1 = d_angular_intermediates(i, 2);
   dSBO2 = d_angular_intermediates(i, 3);
 
-  expval6 = exp(p_val6 * d_Delta_boc[i]);
+  expval6 = Kokkos::Experimental::exp(p_val6 * d_Delta_boc[i]);
 
   F_FLOAT CdDelta_i = 0.0;
   F_FLOAT fitmp[3],fjtmp[3];
@@ -2786,7 +2786,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   delij[1] = x(j,1) - ytmp;
   delij[2] = x(j,2) - ztmp;
   const F_FLOAT rsqij = delij[0]*delij[0] + delij[1]*delij[1] + delij[2]*delij[2];
-  rij = sqrt(rsqij);
+  rij = Kokkos::Experimental::sqrt(rsqij);
   bo_ij = d_BO(i,j_index);
 
   BOA_ij = bo_ij - thb_cut;
@@ -2800,7 +2800,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   delik[1] = x(k,1) - ytmp;
   delik[2] = x(k,2) - ztmp;
   const F_FLOAT rsqik = delik[0]*delik[0] + delik[1]*delik[1] + delik[2]*delik[2];
-  const F_FLOAT rik = sqrt(rsqik);
+  const F_FLOAT rik = Kokkos::Experimental::sqrt(rsqik);
   bo_ik = d_BO(i,k_index);
   BOA_ik   = bo_ik - thb_cut;
 
@@ -2822,7 +2822,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
     dcos_theta_dk[t] = delij[t] * inv_dists - Cdot_inv3 * rsqij * delik[t];
   }
 
-  sin_theta = sin(theta);
+  sin_theta = Kokkos::Experimental::sin(theta);
   if (sin_theta < 1.0e-5) sin_theta = 1.0e-5;
   p_val1 = paramsthbp(jtype,itype,ktype).p_val1;
 
@@ -2834,21 +2834,21 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   p_val7 = paramsthbp(jtype,itype,ktype).p_val7;
   theta_00 = paramsthbp(jtype,itype,ktype).theta_00;
 
-  exp3ij = exp(-p_val3 * pow(BOA_ij, p_val4));
+  exp3ij = Kokkos::Experimental::exp(-p_val3 * Kokkos::Experimental::pow(BOA_ij, p_val4));
   f7_ij = 1.0 - exp3ij;
-  Cf7ij = p_val3 * p_val4 * pow(BOA_ij, p_val4 - 1.0) * exp3ij;
-  exp3jk = exp(-p_val3 * pow(BOA_ik, p_val4));
+  Cf7ij = p_val3 * p_val4 * Kokkos::Experimental::pow(BOA_ij, p_val4 - 1.0) * exp3ij;
+  exp3jk = Kokkos::Experimental::exp(-p_val3 * Kokkos::Experimental::pow(BOA_ik, p_val4));
   f7_jk = 1.0 - exp3jk;
-  Cf7jk = p_val3 * p_val4 * pow(BOA_ik, p_val4 - 1.0) * exp3jk;
-  expval7 = exp(-p_val7 * d_Delta_boc[i]);
+  Cf7jk = p_val3 * p_val4 * Kokkos::Experimental::pow(BOA_ik, p_val4 - 1.0) * exp3jk;
+  expval7 = Kokkos::Experimental::exp(-p_val7 * d_Delta_boc[i]);
   trm8 = 1.0 + expval6 + expval7;
   f8_Dj = p_val5 - ((p_val5 - 1.0) * (2.0 + expval6) / trm8);
   Cf8j = ((1.0 - p_val5) / (trm8*trm8)) *
    (p_val6 * expval6 * trm8 - (2.0 + expval6) * (p_val6*expval6 - p_val7*expval7));
-  theta_0 = 180.0 - theta_00 * (1.0 - exp(-p_val10 * (2.0 - SBO2)));
+  theta_0 = 180.0 - theta_00 * (1.0 - Kokkos::Experimental::exp(-p_val10 * (2.0 - SBO2)));
   theta_0 = theta_0*constPI/180.0;
 
-  expval2theta  = exp(-p_val2 * (theta_0-theta)*(theta_0-theta));
+  expval2theta  = Kokkos::Experimental::exp(-p_val2 * (theta_0-theta)*(theta_0-theta));
   if (p_val1 >= 0)
     expval12theta = p_val1 * (1.0 - expval2theta);
   else // To avoid linear Me-H-Me angles (6/6/06)
@@ -2858,7 +2858,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   CEval2 = Cf7jk * f7_ij * f8_Dj * expval12theta;
   CEval3 = Cf8j  * f7_ij * f7_jk * expval12theta;
   CEval4 = -2.0 * p_val1 * p_val2 * f7_ij * f7_jk * f8_Dj * expval2theta * (theta_0 - theta);
-  Ctheta_0 = p_val10 * theta_00*constPI/180.0 * exp(-p_val10 * (2.0 - SBO2));
+  Ctheta_0 = p_val10 * theta_00*constPI/180.0 * Kokkos::Experimental::exp(-p_val10 * (2.0 - SBO2));
   CEval5 = -CEval4 * Ctheta_0 * CSBO2;
   CEval6 = CEval5 * dSBO1;
   CEval7 = CEval5 * dSBO2;
@@ -2871,10 +2871,10 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
 
   p_pen1 = paramsthbp(jtype,itype,ktype).p_pen1;
 
-  exp_pen2ij = exp(-p_pen2 * (BOA_ij - 2.0)*(BOA_ij - 2.0));
-  exp_pen2jk = exp(-p_pen2 * (BOA_ik - 2.0)*(BOA_ik - 2.0));
-  exp_pen3 = exp(-p_pen3 * d_Delta[i]);
-  exp_pen4 = exp(p_pen4 * d_Delta[i]);
+  exp_pen2ij = Kokkos::Experimental::exp(-p_pen2 * (BOA_ij - 2.0)*(BOA_ij - 2.0));
+  exp_pen2jk = Kokkos::Experimental::exp(-p_pen2 * (BOA_ik - 2.0)*(BOA_ik - 2.0));
+  exp_pen3 = Kokkos::Experimental::exp(-p_pen3 * d_Delta[i]);
+  exp_pen4 = Kokkos::Experimental::exp(p_pen4 * d_Delta[i]);
   trm_pen34 = 1.0 + exp_pen3 + exp_pen4;
   f9_Dj = (2.0 + exp_pen3) / trm_pen34;
   Cf9j = (-p_pen3 * exp_pen3 * trm_pen34 - (2.0 + exp_pen3) *
@@ -2891,12 +2891,12 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeAngularPreproces
   // ConjAngle energy
 
   p_coa1 = paramsthbp(jtype,itype,ktype).p_coa1;
-  exp_coa2 = exp(p_coa2 * Delta_val);
+  exp_coa2 = Kokkos::Experimental::exp(p_coa2 * Delta_val);
   e_coa = p_coa1 / (1. + exp_coa2) *
-          exp(-p_coa3 * SQR(d_total_bo[j]-BOA_ij)) *
-          exp(-p_coa3 * SQR(d_total_bo[k]-BOA_ik)) *
-          exp(-p_coa4 * SQR(BOA_ij - 1.5)) *
-          exp(-p_coa4 * SQR(BOA_ik - 1.5));
+          Kokkos::Experimental::exp(-p_coa3 * SQR(d_total_bo[j]-BOA_ij)) *
+          Kokkos::Experimental::exp(-p_coa3 * SQR(d_total_bo[k]-BOA_ik)) *
+          Kokkos::Experimental::exp(-p_coa4 * SQR(BOA_ij - 1.5)) *
+          Kokkos::Experimental::exp(-p_coa4 * SQR(BOA_ik - 1.5));
 
   CEcoa1 = -2 * p_coa4 * (BOA_ij - 1.5) * e_coa;
   CEcoa2 = -2 * p_coa4 * (BOA_ik - 1.5) * e_coa;
@@ -3027,14 +3027,14 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
   delij[1] = x(j,1) - ytmp;
   delij[2] = x(j,2) - ztmp;
   const F_FLOAT rsqij = delij[0]*delij[0] + delij[1]*delij[1] + delij[2]*delij[2];
-  const F_FLOAT rij = sqrt(rsqij);
+  const F_FLOAT rij = Kokkos::Experimental::sqrt(rsqij);
 
   BOA_ij = bo_ij - thb_cut;
   Delta_j = d_Delta_boc[j];
-  exp_tor2_ij = exp(-p_tor2 * BOA_ij);
-  exp_cot2_ij = exp(-p_cot2 * SQR(BOA_ij - 1.5));
-  exp_tor3_DiDj = exp(-p_tor3 * (Delta_i + Delta_j));
-  exp_tor4_DiDj = exp(p_tor4  * (Delta_i + Delta_j));
+  exp_tor2_ij = Kokkos::Experimental::exp(-p_tor2 * BOA_ij);
+  exp_cot2_ij = Kokkos::Experimental::exp(-p_cot2 * SQR(BOA_ij - 1.5));
+  exp_tor3_DiDj = Kokkos::Experimental::exp(-p_tor3 * (Delta_i + Delta_j));
+  exp_tor4_DiDj = Kokkos::Experimental::exp(p_tor4  * (Delta_i + Delta_j));
   exp_tor34_inv = 1.0 / (1.0 + exp_tor3_DiDj + exp_tor4_DiDj);
   f11_DiDj = (2.0 + exp_tor3_DiDj) * exp_tor34_inv;
 
@@ -3045,7 +3045,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
   BOA_ik = bo_ik - thb_cut;
   for (int d = 0; d < 3; d ++) delik[d] = x(k,d) - x(i,d);
   const F_FLOAT rsqik = delik[0]*delik[0] + delik[1]*delik[1] + delik[2]*delik[2];
-  const F_FLOAT rik = sqrt(rsqik);
+  const F_FLOAT rik = Kokkos::Experimental::sqrt(rsqik);
 
   cos_ijk = (delij[0]*delik[0]+delij[1]*delik[1]+delij[2]*delik[2])/(rij*rik);
   if (cos_ijk > 1.0) cos_ijk  = 1.0;
@@ -3062,15 +3062,15 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
     dcos_ijk_dk[d] = delij[d] * inv_dists - cos_ijk_tmp * rsqij * delik[d];
   }
 
-  sin_ijk = sin(theta_ijk);
+  sin_ijk = Kokkos::Experimental::sin(theta_ijk);
   if (sin_ijk >= 0 && sin_ijk <= MIN_SINE)
     tan_ijk_i = cos_ijk / MIN_SINE;
   else if (sin_ijk <= 0 && sin_ijk >= -MIN_SINE)
     tan_ijk_i = -cos_ijk / MIN_SINE;
   else tan_ijk_i = cos_ijk / sin_ijk;
 
-  exp_tor2_ik = exp(-p_tor2 * BOA_ik);
-  exp_cot2_ik = exp(-p_cot2 * SQR(BOA_ik -1.5));
+  exp_tor2_ik = Kokkos::Experimental::exp(-p_tor2 * BOA_ik);
+  exp_cot2_ik = Kokkos::Experimental::exp(-p_cot2 * SQR(BOA_ik -1.5));
 
   const int ltype = type(l);
 
@@ -3078,7 +3078,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
 
   for (int d = 0; d < 3; d ++) deljl[d] = x(l,d) - x(j,d);
   const F_FLOAT rsqjl = deljl[0]*deljl[0] + deljl[1]*deljl[1] + deljl[2]*deljl[2];
-  const F_FLOAT rjl = sqrt(rsqjl);
+  const F_FLOAT rjl = Kokkos::Experimental::sqrt(rsqjl);
   BOA_jl = bo_jl - thb_cut;
 
   cos_jil = -(delij[0]*deljl[0]+delij[1]*deljl[1]+delij[2]*deljl[2])/(rij*rjl);
@@ -3096,7 +3096,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
     dcos_jil_dk[d] = -delij[d] * inv_distjl - cos_jil_tmp * rsqij * deljl[d];
   }
 
-  sin_jil = sin(theta_jil);
+  sin_jil = Kokkos::Experimental::sin(theta_jil);
   if (sin_jil >= 0 && sin_jil <= MIN_SINE)
     tan_jil_i = cos_jil / MIN_SINE;
   else if (sin_jil <= 0 && sin_jil >= -MIN_SINE)
@@ -3105,7 +3105,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
 
   for (int d = 0; d < 3; d ++) dellk[d] = x(k,d) - x(l,d);
   const F_FLOAT rsqlk = dellk[0]*dellk[0] + dellk[1]*dellk[1] + dellk[2]*dellk[2];
-  const F_FLOAT rlk = sqrt(rsqlk);
+  const F_FLOAT rlk = Kokkos::Experimental::sqrt(rsqlk);
 
   // non-Kokkos ReaxFF has a separate function for computing omega, which
   //  limits the scope of the MIN_SINE statements below
@@ -3157,9 +3157,9 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
   if (arg >  1.0) arg =  1.0;
   if (arg < -1.0) arg = -1.0;
 
-  cos_omega = cos(omega);
-  cos2omega = cos(2. * omega);
-  cos3omega = cos(3. * omega);
+  cos_omega = Kokkos::Experimental::cos(omega);
+  cos2omega = Kokkos::Experimental::cos(2. * omega);
+  cos3omega = Kokkos::Experimental::cos(3. * omega);
 
   // torsion energy
 
@@ -3169,9 +3169,9 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeTorsionPreproces
   V2 = paramsfbp(ktype,itype,jtype,ltype).V2;
   V3 = paramsfbp(ktype,itype,jtype,ltype).V3;
 
-  exp_tor1 = exp(p_tor1 * SQR(2.0 - d_BO_pi(i,j_index) - f11_DiDj));
-  exp_tor2_jl = exp(-p_tor2 * BOA_jl);
-  exp_cot2_jl = exp(-p_cot2 * SQR(BOA_jl - 1.5));
+  exp_tor1 = Kokkos::Experimental::exp(p_tor1 * SQR(2.0 - d_BO_pi(i,j_index) - f11_DiDj));
+  exp_tor2_jl = Kokkos::Experimental::exp(-p_tor2 * BOA_jl);
+  exp_cot2_jl = Kokkos::Experimental::exp(-p_cot2 * SQR(BOA_jl - 1.5));
   fn10 = (1.0 - exp_tor2_ik) * (1.0 - exp_tor2_ij) * (1.0 - exp_tor2_jl);
 
   CV = 0.5 * (V1 * (1.0 + cos_omega) + V2 * exp_tor1 * (1.0 - cos2omega) + V3 * (1.0 + cos3omega));
@@ -3369,7 +3369,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeHydrogen<NEIGHFL
     delik[1] = x(k,1) - ytmp;
     delik[2] = x(k,2) - ztmp;
     const F_FLOAT rsqik = delik[0]*delik[0] + delik[1]*delik[1] + delik[2]*delik[2];
-    const F_FLOAT rik = sqrt(rsqik);
+    const F_FLOAT rik = Kokkos::Experimental::sqrt(rsqik);
 
     for (int itr = 0; itr < top; itr++) {
       const int jj = hblist[itr];
@@ -3386,7 +3386,7 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeHydrogen<NEIGHFL
       delij[1] = x(j,1) - ytmp;
       delij[2] = x(j,2) - ztmp;
       const F_FLOAT rsqij = delij[0]*delij[0] + delij[1]*delij[1] + delij[2]*delij[2];
-      const F_FLOAT rij = sqrt(rsqij);
+      const F_FLOAT rij = Kokkos::Experimental::sqrt(rsqij);
 
       // theta and derivatives
       cos_theta = (delij[0]*delik[0]+delij[1]*delik[1]+delij[2]*delik[2])/(rij*rik);
@@ -3409,12 +3409,12 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeHydrogen<NEIGHFL
       const F_FLOAT p_hb3 = paramshbp(jtype,itype,ktype).p_hb3;
       const F_FLOAT r0_hb = paramshbp(jtype,itype,ktype).r0_hb;
 
-      sin_theta2 = sin(theta/2.0);
+      sin_theta2 = Kokkos::Experimental::sin(theta/2.0);
       sin_xhz4 = SQR(sin_theta2);
       sin_xhz4 *= sin_xhz4;
       cos_xhz1 = (1.0 - cos_theta);
-      exp_hb2 = exp(-p_hb2 * bo_ij);
-      exp_hb3 = exp(-p_hb3 * (r0_hb/rik + rik/r0_hb - 2.0));
+      exp_hb2 = Kokkos::Experimental::exp(-p_hb2 * bo_ij);
+      exp_hb3 = Kokkos::Experimental::exp(-p_hb3 * (r0_hb/rik + rik/r0_hb - 2.0));
 
       e_hb = p_hb1 * (1.0 - exp_hb2) * exp_hb3 * sin_xhz4;
       if (EVFLAG && eflag_global) ev.ereax[8] += e_hb;
@@ -3575,8 +3575,8 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeBond1<NEIGHFLAG,
     const F_FLOAT BO_pi2_i = d_BO_pi2(i,j_index);
 
     if (BO_s_i == 0.0) pow_BOs_be2 = 0.0;
-    else pow_BOs_be2 = pow(BO_s_i,p_be2);
-    exp_be12 = exp(p_be1*(1.0-pow_BOs_be2));
+    else pow_BOs_be2 = Kokkos::Experimental::pow(BO_s_i,p_be2);
+    exp_be12 = Kokkos::Experimental::exp(p_be1*(1.0-pow_BOs_be2));
     CEbo = -De_s*exp_be12*(1.0-p_be1*p_be2*pow_BOs_be2);
     ebond = -De_s*BO_s_i*exp_be12
                               -De_p*BO_pi_i
@@ -3597,10 +3597,10 @@ void PairReaxFFKokkos<DeviceType>::operator()(TagPairReaxComputeBond1<NEIGHFLAG,
     if (BO_i >= 1.00) {
       if (gp[37] == 2 || (imass == 12.0000 && jmass == 15.9990) ||
                          (jmass == 12.0000 && imass == 15.9990)) {
-        const F_FLOAT exphu = exp(-gp[7] * SQR(BO_i - 2.50));
-        const F_FLOAT exphua1 = exp(-gp[3] * (d_total_bo[i]-BO_i));
-        const F_FLOAT exphub1 = exp(-gp[3] * (d_total_bo[j]-BO_i));
-        const F_FLOAT exphuov = exp(gp[4] * (d_Delta[i] + d_Delta[j]));
+        const F_FLOAT exphu = Kokkos::Experimental::exp(-gp[7] * SQR(BO_i - 2.50));
+        const F_FLOAT exphua1 = Kokkos::Experimental::exp(-gp[3] * (d_total_bo[i]-BO_i));
+        const F_FLOAT exphub1 = Kokkos::Experimental::exp(-gp[3] * (d_total_bo[j]-BO_i));
+        const F_FLOAT exphuov = Kokkos::Experimental::exp(gp[4] * (d_Delta[i] + d_Delta[j]));
         const F_FLOAT hulpov = 1.0 / (1.0 + 25.0 * exphuov);
         estriph = gp[10] * exphu * hulpov * (exphua1 + exphub1);
 

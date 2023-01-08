@@ -784,7 +784,7 @@ void PairPACEKokkos<DeviceType>::operator() (TagPairPACEComputeNeigh,const typen
       const F_FLOAT dely = ytmp - x(j,1);
       const F_FLOAT delz = ztmp - x(j,2);
       const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
-      const F_FLOAT r = sqrt(rsq);
+      const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
       const F_FLOAT rinv = 1.0/r;
       const int mu_j = d_map(type(j));
       d_mu(ii,offset) = mu_j;
@@ -1274,8 +1274,8 @@ void PairPACEKokkos<DeviceType>::pre_compute_harmonics(int lmax)
     const double l2 = lsq - ld + 1;
     for (int m = 0; m < l - 1; m++) {
       const double msq = m * m;
-      const double a = sqrt((double(l1)) / (double(lsq - msq)));
-      const double b = -sqrt((double(l2 - msq)) / (double(4 * l2 - 1)));
+      const double a = Kokkos::Experimental::sqrt((double(l1)) / (double(lsq - msq)));
+      const double b = -Kokkos::Experimental::sqrt((double(l2 - msq)) / (double(4 * l2 - 1)));
       const int idx = l * (l + 1) + m; // (l, m)
       h_alm(idx) = a;
       h_blm(idx) = b;
@@ -1283,8 +1283,8 @@ void PairPACEKokkos<DeviceType>::pre_compute_harmonics(int lmax)
   }
 
   for (int l = 1; l <= lmax; l++) {
-    h_cl(l) = -sqrt(1.0 + 0.5 / (double(l)));
-    h_dl(l) = sqrt(double(2 * (l - 1) + 3));
+    h_cl(l) = -Kokkos::Experimental::sqrt(1.0 + 0.5 / (double(l)));
+    h_dl(l) = Kokkos::Experimental::sqrt(double(2 * (l - 1) + 3));
   }
 
   Kokkos::deep_copy(alm, h_alm);
@@ -1300,7 +1300,7 @@ KOKKOS_INLINE_FUNCTION
 void PairPACEKokkos<DeviceType>::compute_barplm(int ii, int jj, double rz, int lmax) const
 {
   // requires -1 <= rz <= 1 , NO CHECKING IS PERFORMED !!!!!!!!!
-  // prefactors include 1/sqrt(2) factor compared to reference
+  // prefactors include 1/Kokkos::Experimental::sqrt(2) factor compared to reference
 
   // l=0, m=0
   // plm(ii, jj, 0, 0) = Y00/sq1o4pi; //= sq1o4pi;
@@ -1444,8 +1444,8 @@ void PairPACEKokkos<DeviceType>::cutoff_func_poly(const double r, const double r
     dfc = 0;
   } else {
     double x = 1 - 2 * (1 + (r - r_in) / delta_in);
-    fc = 0.5 + 7.5 / 2. * (x / 4. - pow(x, 3) / 6. + pow(x, 5) / 20.);
-    dfc = -7.5 / delta_in * (0.25 - x * x / 2.0 + pow(x, 4) / 4.);
+    fc = 0.5 + 7.5 / 2. * (x / 4. - Kokkos::Experimental::pow(x, 3) / 6. + Kokkos::Experimental::pow(x, 5) / 20.);
+    dfc = -7.5 / delta_in * (0.25 - x * x / 2.0 + Kokkos::Experimental::pow(x, 4) / 4.);
   }
 }
 
@@ -1458,22 +1458,22 @@ void PairPACEKokkos<DeviceType>::Fexp(const double x, const double m, double &F,
   const double w = 1.e6;
   const double eps = 1e-10;
 
-  const double lambda = pow(1.0 / w, m - 1.0);
+  const double lambda = Kokkos::Experimental::pow(1.0 / w, m - 1.0);
   if (abs(x) > eps) {
     double g;
     const double a = abs(x);
-    const double am = pow(a, m);
-    const double w3x3 = pow(w * a, 3); //// use cube
+    const double am = Kokkos::Experimental::pow(a, m);
+    const double w3x3 = Kokkos::Experimental::pow(w * a, 3); //// use cube
     const double sign_factor = (signbit(x) ? -1 : 1);
     if (w3x3 > 30.0)
         g = 0.0;
     else
-        g = exp(-w3x3);
+        g = Kokkos::Experimental::exp(-w3x3);
 
     const double omg = 1.0 - g;
     F = sign_factor * (omg * am + lambda * g * a);
     const double dg = -3.0 * w * w * w * a * a * g;
-    DF = m * pow(a, m - 1.0) * omg - am * dg + lambda * dg * a + lambda * g;
+    DF = m * Kokkos::Experimental::pow(a, m - 1.0) * omg - am * dg + lambda * dg * a + lambda * g;
   } else {
     F = lambda * x;
     DF = lambda;
@@ -1493,13 +1493,13 @@ void PairPACEKokkos<DeviceType>::FexpShiftedScaled(const double rho, const doubl
     DF = 1;
   } else {
     const double a = abs(rho);
-    const double exprho = exp(-a);
+    const double exprho = Kokkos::Experimental::exp(-a);
     const double nx = 1. / mexp;
-    const double xoff = pow(nx, (nx / (1.0 - nx))) * exprho;
-    const double yoff = pow(nx, (1 / (1.0 - nx))) * exprho;
+    const double xoff = Kokkos::Experimental::pow(nx, (nx / (1.0 - nx))) * exprho;
+    const double yoff = Kokkos::Experimental::pow(nx, (1 / (1.0 - nx))) * exprho;
     const double sign_factor = (signbit(rho) ? -1 : 1);
-    F = sign_factor * (pow(xoff + a, mexp) - yoff);
-    DF = yoff + mexp * (-xoff + 1.0) * pow(xoff + a, mexp - 1.);
+    F = sign_factor * (Kokkos::Experimental::pow(xoff + a, mexp) - yoff);
+    DF = yoff + mexp * (-xoff + 1.0) * Kokkos::Experimental::pow(xoff + a, mexp - 1.);
   }
 }
 

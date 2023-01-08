@@ -351,7 +351,7 @@ void PairGranHookeHistoryKokkos<DeviceType>::operator()(TagPairGranHookeHistoryC
 
     // check for touching neighbors
 
-    const LMP_FLOAT r = sqrt(rsq);
+    const LMP_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const LMP_FLOAT rinv = 1.0/r;
     const LMP_FLOAT rsqinv = 1/rsq;
 
@@ -394,7 +394,7 @@ void PairGranHookeHistoryKokkos<DeviceType>::operator()(TagPairGranHookeHistoryC
     V_FLOAT vtr2 = vt2 - (delx*wr3-delz*wr1);
     V_FLOAT vtr3 = vt3 - (dely*wr1-delx*wr2);
     V_FLOAT vrel = vtr1*vtr1 + vtr2*vtr2 + vtr3*vtr3;
-    vrel = sqrt(vrel);
+    vrel = Kokkos::Experimental::sqrt(vrel);
 
     // shear history effects
 
@@ -406,7 +406,7 @@ void PairGranHookeHistoryKokkos<DeviceType>::operator()(TagPairGranHookeHistoryC
       shear2 += vtr2*dt;
       shear3 += vtr3*dt;
     }
-    X_FLOAT shrmag = sqrt(shear1*shear1 + shear2*shear2 +
+    X_FLOAT shrmag = Kokkos::Experimental::sqrt(shear1*shear1 + shear2*shear2 +
                           shear3*shear3);
 
     // rotate shear displacements
@@ -427,7 +427,7 @@ void PairGranHookeHistoryKokkos<DeviceType>::operator()(TagPairGranHookeHistoryC
 
     // rescale frictional displacements and forces if needed
 
-    F_FLOAT fs = sqrt(fs1*fs1 + fs2*fs2 + fs3*fs3);
+    F_FLOAT fs = Kokkos::Experimental::sqrt(fs1*fs1 + fs2*fs2 + fs3*fs3);
     F_FLOAT fn = xmu * fabs(ccel*r);
 
     if (fs > fn) {

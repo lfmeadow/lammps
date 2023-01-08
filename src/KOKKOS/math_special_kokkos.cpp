@@ -11,7 +11,7 @@ using namespace LAMMPS_NS;
  *   Faddeeva's w_of_z. Also provide Dawson and Voigt functions.
  *
  * File erfcx.c:
- *   Compute erfcx(x) = exp(x^2) erfc(x) function, for real x,
+ *   Compute erfcx(x) = Kokkos::Experimental::exp(x^2) erfc(x) function, for real x,
  *   using a novel algorithm that is much faster than DERFC of SLATEC.
  *   This function is used in the computation of Faddeeva, Dawson, and
  *   other complex error functions.

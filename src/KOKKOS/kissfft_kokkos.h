@@ -119,8 +119,8 @@
     }while(0)
 */
 
-#define KISS_FFT_COS(phase) (FFT_SCALAR) cos(phase)
-#define KISS_FFT_SIN(phase) (FFT_SCALAR) sin(phase)
+#define KISS_FFT_COS(phase) (FFT_SCALAR) Kokkos::Experimental::cos(phase)
+#define KISS_FFT_SIN(phase) (FFT_SCALAR) Kokkos::Experimental::sin(phase)
 #define HALF_OF(x) ((x)*.5)
 
 #define  kf_cexp(x,x_index,phase) \
@@ -456,7 +456,7 @@ class KissFFTKokkos {
   {
       int p=4, nf=0;
       double floor_sqrt;
-      floor_sqrt = floor( sqrt((double)n) );
+      floor_sqrt = floor( Kokkos::Experimental::sqrt((double)n) );
       int facbuf_count = 0;
       int p_max = 0;
 

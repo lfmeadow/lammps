@@ -189,7 +189,7 @@ void FixMomentumKokkos<DeviceType>::end_of_step()
     ekin_new = get_kinetic_energy<DeviceType>(atomKK, world, groupbit, nlocal, v, mask);
 
     double factor = 1.0;
-    if (ekin_new != 0.0) factor = sqrt(ekin_old/ekin_new);
+    if (ekin_new != 0.0) factor = Kokkos::Experimental::sqrt(ekin_old/ekin_new);
     Kokkos::parallel_for(Kokkos::RangePolicy<DeviceType>(0,nlocal),
      LAMMPS_LAMBDA(int i) {
       if (mask(i) & groupbit2) {

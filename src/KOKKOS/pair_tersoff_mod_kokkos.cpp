@@ -377,7 +377,7 @@ void PairTersoffMODKokkos<DeviceType>::tersoff_mod_compute(const int &ii, EV_FLO
     const F_FLOAT r = sqrt(rsq);
     const F_FLOAT tmp_fce = ters_fc_k(d_params(iparam_ij),r);
     const F_FLOAT tmp_fcd = ters_dfc(d_params(iparam_ij),r);
-    const F_FLOAT tmp_exp = exp(-d_params(iparam_ij).lam1 * r);
+    const F_FLOAT tmp_exp = Kokkos::Experimental::exp(-d_params(iparam_ij).lam1 * r);
     const F_FLOAT frep = -d_params(iparam_ij).biga * tmp_exp *
                           (tmp_fcd - tmp_fce*d_params(iparam_ij).lam1) / r;
     const F_FLOAT eng = tmp_fce * d_params(iparam_ij).biga * tmp_exp;
@@ -563,8 +563,8 @@ double PairTersoffMODKokkos<DeviceType>::ters_fc_k(const Param& param, const F_F
 
   if (r < ters_R-ters_D) return 1.0;
   if (r > ters_R+ters_D) return 0.0;
-  return 0.5*(1.0 - 1.125*sin(MY_PI2*(r - ters_R)/ters_D) -
-              0.125*sin(3.0*MY_PI2*(r - ters_R)/ters_D));
+  return 0.5*(1.0 - 1.125*Kokkos::Experimental::sin(MY_PI2*(r - ters_R)/ters_D) -
+              0.125*Kokkos::Experimental::sin(3.0*MY_PI2*(r - ters_R)/ters_D));
 }
 
 /* ---------------------------------------------------------------------- */
@@ -578,8 +578,8 @@ double PairTersoffMODKokkos<DeviceType>::ters_dfc(const Param& param, const F_FL
 
   if (r < ters_R-ters_D) return 0.0;
   if (r > ters_R+ters_D) return 0.0;
-  return -(0.375*MY_PI4/ters_D) * (3.0*cos(MY_PI2*(r - ters_R)/ters_D) +
-                                   cos(3.0*MY_PI2*(r - ters_R)/ters_D));
+  return -(0.375*MY_PI4/ters_D) * (3.0*Kokkos::Experimental::cos(MY_PI2*(r - ters_R)/ters_D) +
+                                   Kokkos::Experimental::cos(3.0*MY_PI2*(r - ters_R)/ters_D));
 }
 
 /* ---------------------------------------------------------------------- */
@@ -600,7 +600,7 @@ double PairTersoffMODKokkos<DeviceType>::bondorder(const Param& param,
 
   if (arg > 69.0776) ex_delr = 1.e30;
   else if (arg < -69.0776) ex_delr = 0.0;
-  else ex_delr = exp(arg);
+  else ex_delr = Kokkos::Experimental::exp(arg);
 
   return ters_fc_k(param,rik) * ters_gijk(param,costheta) * ex_delr;
 }
@@ -620,7 +620,7 @@ double PairTersoffMODKokkos<DeviceType>::
   const F_FLOAT tmp_h = (param.h - cos)*(param.h - cos);
 
   return ters_c1 + (ters_c2*tmp_h/(ters_c3 + tmp_h)) *
-      (1.0 + ters_c4*exp(-ters_c5*tmp_h));
+      (1.0 + ters_c4*Kokkos::Experimental::exp(-ters_c5*tmp_h));
 
 }
 
@@ -637,7 +637,7 @@ double PairTersoffMODKokkos<DeviceType>::
   const F_FLOAT ters_c5 = param.c5;
   const F_FLOAT tmp_h = (param.h - cos)*(param.h - cos);
   const F_FLOAT g1 = (param.h - cos)/(ters_c3 + tmp_h);
-  const F_FLOAT g2 = exp(-ters_c5*tmp_h);
+  const F_FLOAT g2 = Kokkos::Experimental::exp(-ters_c5*tmp_h);
 
   return -2.0*ters_c2*g1*((1 + ters_c4*g2)*(1 + g1*(cos - param.h)) -
                             tmp_h*ters_c4*ters_c5*g2);
@@ -650,7 +650,7 @@ KOKKOS_INLINE_FUNCTION
 double PairTersoffMODKokkos<DeviceType>::ters_fa_k(const Param& param, const F_FLOAT &r) const
 {
   if (r > param.bigr + param.bigd) return 0.0;
-  return -param.bigb * exp(-param.lam2 * r)
+  return -param.bigb * Kokkos::Experimental::exp(-param.lam2 * r)
           * ters_fc_k(param,r);
 }
 
@@ -661,7 +661,7 @@ KOKKOS_INLINE_FUNCTION
 double PairTersoffMODKokkos<DeviceType>::ters_dfa(const Param& param, const F_FLOAT &r) const
 {
   if (r > param.bigr + param.bigd) return 0.0;
-  return param.bigb * exp(-param.lam2 * r) *
+  return param.bigb * Kokkos::Experimental::exp(-param.lam2 * r) *
     (param.lam2 * ters_fc_k(param,r) - ters_dfc(param,r));
 }
 
@@ -673,10 +673,10 @@ double PairTersoffMODKokkos<DeviceType>::ters_bij_k(const Param& param, const F_
 {
   const F_FLOAT tmp = param.beta * bo;
   if (tmp > param.ca1)
-    return pow(tmp, -param.powern/(2.0*param.powern_del));
+    return Kokkos::Experimental::pow(tmp, -param.powern/(2.0*param.powern_del));
   if (tmp < param.ca4)
     return 1.0;
-  return pow(1.0 + pow(tmp,param.powern), -1.0/(2.0*param.powern_del));
+  return Kokkos::Experimental::pow(1.0 + Kokkos::Experimental::pow(tmp,param.powern), -1.0/(2.0*param.powern_del));
 }
 
 /* ---------------------------------------------------------------------- */
@@ -688,13 +688,13 @@ double PairTersoffMODKokkos<DeviceType>::ters_dbij(const Param& param, const F_F
   const F_FLOAT tmp = param.beta * bo;
   if (tmp > param.ca1)
     return -0.5*(param.powern/param.powern_del)*
-          pow(tmp,-0.5*(param.powern/param.powern_del)) / bo;
+          Kokkos::Experimental::pow(tmp,-0.5*(param.powern/param.powern_del)) / bo;
   if (tmp < param.ca4)
     return 0.0;
 
-  const F_FLOAT tmp_n = pow(tmp,param.powern);
+  const F_FLOAT tmp_n = Kokkos::Experimental::pow(tmp,param.powern);
   return -0.5 *(param.powern/param.powern_del)*
-          pow(1.0+tmp_n, -1.0-(1.0/(2.0*param.powern_del)))*tmp_n / bo;
+          Kokkos::Experimental::pow(1.0+tmp_n, -1.0-(1.0/(2.0*param.powern_del)))*tmp_n / bo;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -736,7 +736,7 @@ void PairTersoffMODKokkos<DeviceType>::ters_dthb(
 
   if (tmp > 69.0776) ex_delr = 1.e30;
   else if (tmp < -69.0776) ex_delr = 0.0;
-  else ex_delr = exp(tmp);
+  else ex_delr = Kokkos::Experimental::exp(tmp);
 
   if (int(param.powerm) == 3)
     dex_delr = 3.0*paramtmp*paramtmp*param.lam3*ex_delr;//pow(rij-rik,2.0)*ex_delr;
@@ -805,7 +805,7 @@ void PairTersoffMODKokkos<DeviceType>::ters_dthbj(
 
   if (tmp > 69.0776) ex_delr = 1.e30;
   else if (tmp < -69.0776) ex_delr = 0.0;
-  else ex_delr = exp(tmp);
+  else ex_delr = Kokkos::Experimental::exp(tmp);
 
   if (int(param.powerm) == 3)
     dex_delr = 3.0*paramtmp*paramtmp*param.lam3*ex_delr;//pow(param.lam3,3.0) * pow(rij-rik,2.0)*ex_delr;
@@ -867,7 +867,7 @@ void PairTersoffMODKokkos<DeviceType>::ters_dthbk(
 
   if (tmp > 69.0776) ex_delr = 1.e30;
   else if (tmp < -69.0776) ex_delr = 0.0;
-  else ex_delr = exp(tmp);
+  else ex_delr = Kokkos::Experimental::exp(tmp);
 
   if (int(param.powerm) == 3)
     dex_delr = 3.0*paramtmp*paramtmp*param.lam3*ex_delr;//pow(param.lam3,3.0) * pow(rij-rik,2.0)*ex_delr;

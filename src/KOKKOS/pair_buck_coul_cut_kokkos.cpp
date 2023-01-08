@@ -164,8 +164,8 @@ compute_fpair(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
               const int& itype, const int& jtype) const {
   const F_FLOAT r2inv = 1.0/rsq;
   const F_FLOAT r6inv = r2inv*r2inv*r2inv;
-  const F_FLOAT r = sqrt(rsq);
-  const F_FLOAT rexp = exp(-r*(STACKPARAMS?m_params[itype][jtype].rhoinv:params(itype,jtype).rhoinv));
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
+  const F_FLOAT rexp = Kokkos::Experimental::exp(-r*(STACKPARAMS?m_params[itype][jtype].rhoinv:params(itype,jtype).rhoinv));
 
   const F_FLOAT forcebuck =
      (STACKPARAMS?m_params[itype][jtype].buck1:params(itype,jtype).buck1)*r*rexp -
@@ -185,8 +185,8 @@ compute_evdwl(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
               const int& itype, const int& jtype) const {
   const F_FLOAT r2inv = 1.0/rsq;
   const F_FLOAT r6inv = r2inv*r2inv*r2inv;
-  const F_FLOAT r = sqrt(rsq);
-  const F_FLOAT rexp = exp(-r*(STACKPARAMS?m_params[itype][jtype].rhoinv:params(itype,jtype).rhoinv));
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
+  const F_FLOAT rexp = Kokkos::Experimental::exp(-r*(STACKPARAMS?m_params[itype][jtype].rhoinv:params(itype,jtype).rhoinv));
 
   return (STACKPARAMS?m_params[itype][jtype].a:params(itype,jtype).a)*rexp -
                 (STACKPARAMS?m_params[itype][jtype].c:params(itype,jtype).c)*r6inv -
@@ -203,7 +203,7 @@ F_FLOAT PairBuckCoulCutKokkos<DeviceType>::
 compute_fcoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const int& /*itype*/, const int& /*jtype*/, const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   F_FLOAT forcecoul;
 
   forcecoul = qqrd2e*qtmp*q(j) *rinv;
@@ -221,7 +221,7 @@ F_FLOAT PairBuckCoulCutKokkos<DeviceType>::
 compute_ecoul(const F_FLOAT& rsq, const int& /*i*/, const int& j,
               const int& /*itype*/, const int& /*jtype*/, const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
 
   return factor_coul*qqrd2e*qtmp*q(j)*rinv;
 

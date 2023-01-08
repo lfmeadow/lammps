@@ -136,18 +136,18 @@ void FixDtResetKokkos<DeviceType>::operator()(TagFixDtResetMass, const int &i, d
     vsq = v(i,0) * v(i,0) + v(i,1) * v(i,1) + v(i,2) * v(i,2);
     fsq = f(i,0) * f(i,0) + f(i,1) * f(i,1) + f(i,2) * f(i,2);
     dtv = dtf = dte = BIG;
-    if (vsq > 0.0) dtv = xmax / sqrt(vsq);
-    if (fsq > 0.0) dtf = sqrt(2.0 * xmax / (ftm2v * sqrt(fsq) * massinv));
+    if (vsq > 0.0) dtv = xmax / Kokkos::Experimental::sqrt(vsq);
+    if (fsq > 0.0) dtf = Kokkos::Experimental::sqrt(2.0 * xmax / (ftm2v * sqrt(fsq) * massinv));
     k_dt = MIN(dtv, dtf);
     if ((emax > 0.0) && (fsq * vsq > 0.0)) {
-      dte = emax / sqrt(fsq * vsq) / sqrt(ftm2v * mvv2e);
+      dte = emax / Kokkos::Experimental::sqrt(fsq * vsq) / sqrt(ftm2v * mvv2e);
       k_dt = MIN(dt, dte);
     }
     dtsq = k_dt * k_dt;
     delx = k_dt * v(i,0) + 0.5 * dtsq * massinv * f(i,0) * ftm2v;
     dely = k_dt * v(i,1) + 0.5 * dtsq * massinv * f(i,1) * ftm2v;
     delz = k_dt * v(i,2) + 0.5 * dtsq * massinv * f(i,2) * ftm2v;
-    delr = sqrt(delx * delx + dely * dely + delz * delz);
+    delr = Kokkos::Experimental::sqrt(delx * delx + dely * dely + delz * delz);
     if (delr > xmax) k_dt *= xmax / delr;
   }
  }
@@ -170,18 +170,18 @@ void FixDtResetKokkos<DeviceType>::operator()(TagFixDtResetRMass, const int &i, 
     vsq = v(i,0) * v(i,0) + v(i,1) * v(i,1) + v(i,2) * v(i,2);
     fsq = f(i,0) * f(i,0) + f(i,1) * f(i,1) + f(i,2) * f(i,2);
     dtv = dtf = dte = BIG;
-    if (vsq > 0.0) dtv = xmax / sqrt(vsq);
-    if (fsq > 0.0) dtf = sqrt(2.0 * xmax / (ftm2v * sqrt(fsq) * massinv));
+    if (vsq > 0.0) dtv = xmax / Kokkos::Experimental::sqrt(vsq);
+    if (fsq > 0.0) dtf = Kokkos::Experimental::sqrt(2.0 * xmax / (ftm2v * sqrt(fsq) * massinv));
     k_dt = MIN(dtv, dtf);
     if ((emax > 0.0) && (fsq * vsq > 0.0)) {
-      dte = emax / sqrt(fsq * vsq) / sqrt(ftm2v * mvv2e);
+      dte = emax / Kokkos::Experimental::sqrt(fsq * vsq) / sqrt(ftm2v * mvv2e);
       k_dt = MIN(dt, dte);
     }
     dtsq = k_dt * k_dt;
     delx = k_dt * v(i,0) + 0.5 * dtsq * massinv * f(i,0) * ftm2v;
     dely = k_dt * v(i,1) + 0.5 * dtsq * massinv * f(i,1) * ftm2v;
     delz = k_dt * v(i,2) + 0.5 * dtsq * massinv * f(i,2) * ftm2v;
-    delr = sqrt(delx * delx + dely * dely + delz * delz);
+    delr = Kokkos::Experimental::sqrt(delx * delx + dely * dely + delz * delz);
     if (delr > xmax) k_dt *= xmax / delr;
   }
 }

@@ -666,8 +666,8 @@ void FixShakeKokkos<DeviceType>::shake(int m, EV_FLOAT& ev) const
   // exact quadratic solution for lamda
 
   double lamda,lamda1,lamda2;
-  lamda1 = (-b+sqrt(determ)) / (2.0*a);
-  lamda2 = (-b-sqrt(determ)) / (2.0*a);
+  lamda1 = (-b+Kokkos::Experimental::sqrt(determ)) / (2.0*a);
+  lamda2 = (-b-Kokkos::Experimental::sqrt(determ)) / (2.0*a);
 
   if (fabs(lamda1) <= fabs(lamda2)) lamda = lamda1;
   else lamda = lamda2;

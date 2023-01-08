@@ -170,7 +170,7 @@ compute_fpair(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
      (STACKPARAMS?m_params[itype][jtype].lj2:params(itype,jtype).lj2));
 
   if (rsq > cut_lj_innersq) {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT tlj = r - cut_lj_inner;
     const F_FLOAT fswitch = r*tlj*tlj*
             ((STACKPARAMS?m_params[itype][jtype].ljsw1:params(itype,jtype).ljsw1) +
@@ -198,7 +198,7 @@ compute_evdwl(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
   englj += (STACKPARAMS?m_params[itype][jtype].ljsw5:params(itype,jtype).ljsw5);
 
   if (rsq > cut_lj_innersq) {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT tlj = r - cut_lj_inner;
     const F_FLOAT eswitch = tlj*tlj*tlj *
             ((STACKPARAMS?m_params[itype][jtype].ljsw3:params(itype,jtype).ljsw3) +
@@ -220,7 +220,7 @@ compute_fcoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   F_FLOAT forcecoul = qqrd2e*qtmp*q(j) *rinv;
 
   if (rsq > cut_coul_innersq) {
@@ -244,7 +244,7 @@ compute_ecoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   F_FLOAT ecoul = qqrd2e * qtmp * q(j) * (rinv-coulsw5);
 
   if (rsq > cut_coul_innersq) {

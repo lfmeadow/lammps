@@ -120,7 +120,7 @@ class FixShardlowKokkos : public FixShardlow {
   typedef Kokkos::View<random_external_state::es_RNG_t*,DeviceType> es_RNGs_type;
   es_RNGs_type d_rand_state;
 
-  double dtsqrt; // = sqrt(update->dt);
+  double dtsqrt; // = Kokkos::Experimental::sqrt(update->dt);
   int ghostmax;
   int nlocal, nghost;
 

@@ -25,12 +25,12 @@ using namespace MathSpecialKokkos;
 
 //-----------------------------------------------------------------------------
 // Compute G(gamma) based on selection flag ibar:
-//  0 => G = sqrt(1+gamma)
-//  1 => G = exp(gamma/2)
+//  0 => G = Kokkos::Experimental::sqrt(1+gamma)
+//  1 => G = Kokkos::Experimental::exp(gamma/2)
 //  2 => not implemented
-//  3 => G = 2/(1+exp(-gamma))
-//  4 => G = sqrt(1+gamma)
-// -5 => G = +-sqrt(abs(1+gamma))
+//  3 => G = 2/(1+Kokkos::Experimental::exp(-gamma))
+//  4 => G = Kokkos::Experimental::sqrt(1+gamma)
+// -5 => G = +-Kokkos::Experimental::sqrt(abs(1+gamma))
 //
 template<class DeviceType>
 KOKKOS_INLINE_FUNCTION
@@ -47,9 +47,9 @@ double MEAMKokkos<DeviceType>::G_gam(const double gamma, const int ibar, int &er
         // gsmooth_switchpoint = -0.99
         // G = 0.01*(-0.99/gamma)**99
         double G = 1 / (gsmooth_factor + 1) * pow((gsmooth_switchpoint / gamma), gsmooth_factor);
-        return sqrt(G);
+        return Kokkos::Experimental::sqrt(G);
       } else {
-        return sqrt(1.0 + gamma);
+        return Kokkos::Experimental::sqrt(1.0 + gamma);
       }
     case 1:
       return MathSpecialKokkos::fm_exp(gamma / 2.0);
@@ -57,9 +57,9 @@ double MEAMKokkos<DeviceType>::G_gam(const double gamma, const int ibar, int &er
       return 2.0 / (1.0 + MathSpecialKokkos::fm_exp(-gamma));
     case -5:
       if ((1.0 + gamma) >= 0) {
-        return sqrt(1.0 + gamma);
+        return Kokkos::Experimental::sqrt(1.0 + gamma);
       } else {
-        return -sqrt(-1.0 - gamma);
+        return -Kokkos::Experimental::sqrt(-1.0 - gamma);
       }
   }
   errorflag = 1;
@@ -68,12 +68,12 @@ double MEAMKokkos<DeviceType>::G_gam(const double gamma, const int ibar, int &er
 
 //-----------------------------------------------------------------------------
 // Compute G(gamma and dG(gamma) based on selection flag ibar:
-//  0 => G = sqrt(1+gamma)
-//  1 => G = exp(gamma/2)
+//  0 => G = Kokkos::Experimental::sqrt(1+gamma)
+//  1 => G = Kokkos::Experimental::exp(gamma/2)
 //  2 => not implemented
-//  3 => G = 2/(1+exp(-gamma))
-//  4 => G = sqrt(1+gamma)
-// -5 => G = +-sqrt(abs(1+gamma))
+//  3 => G = 2/(1+Kokkos::Experimental::exp(-gamma))
+//  4 => G = Kokkos::Experimental::sqrt(1+gamma)
+// -5 => G = +-Kokkos::Experimental::sqrt(abs(1+gamma))
 //
 template<class DeviceType>
 KOKKOS_INLINE_FUNCTION
@@ -91,11 +91,11 @@ double MEAMKokkos<DeviceType>::dG_gam(const double gamma, const int ibar, double
         // gsmooth_switchpoint = -0.99
         // G = 0.01*(-0.99/gamma)**99
         G = 1 / (gsmooth_factor + 1) * pow((gsmooth_switchpoint / gamma), gsmooth_factor);
-        G = sqrt(G);
+        G = Kokkos::Experimental::sqrt(G);
         dG = -gsmooth_factor * G / (2.0 * gamma);
         return G;
       } else {
-        G = sqrt(1.0 + gamma);
+        G = Kokkos::Experimental::sqrt(1.0 + gamma);
         dG = 1.0 / (2.0 * G);
         return G;
       }
@@ -109,11 +109,11 @@ double MEAMKokkos<DeviceType>::dG_gam(const double gamma, const int ibar, double
       return G;
     case -5:
       if ((1.0 + gamma) >= 0) {
-        G = sqrt(1.0 + gamma);
+        G = Kokkos::Experimental::sqrt(1.0 + gamma);
         dG = 1.0 / (2.0 * G);
         return G;
       } else {
-        G = -sqrt(-1.0 - gamma);
+        G = -Kokkos::Experimental::sqrt(-1.0 - gamma);
         dG = -1.0 / (2.0 * G);
         return G;
       }

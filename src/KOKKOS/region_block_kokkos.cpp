@@ -122,7 +122,7 @@ void RegBlockKokkos<DeviceType>::inverse_transform(double &x, double &y, double 
    A = D - C = vector from R line to X0, i.e. Dperp
    B = R0 cross A = vector perp to A in plane of rotation, same len as A
    A,B define plane of circular rotation around R line
-   new x,y,z = P + C + A cos(angle) + B sin(angle)
+   new x,y,z = P + C + A Kokkos::Experimental::cos(angle) + B Kokkos::Experimental::sin(angle)
 ------------------------------------------------------------------------- */
 
 template<class DeviceType>
@@ -131,8 +131,8 @@ void RegBlockKokkos<DeviceType>::rotate(double &x, double &y, double &z, double 
 {
   double a[3],b[3],c[3],d[3],disp[3];
 
-  double sine = sin(angle);
-  double cosine = cos(angle);
+  double sine = Kokkos::Experimental::sin(angle);
+  double cosine = Kokkos::Experimental::cos(angle);
   d[0] = x - point[0];
   d[1] = y - point[1];
   d[2] = z - point[2];

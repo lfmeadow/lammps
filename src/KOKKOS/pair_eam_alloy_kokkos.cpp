@@ -562,7 +562,7 @@ void PairEAMAlloyKokkos<DeviceType>::operator()(TagPairEAMAlloyKernelA<NEIGHFLAG
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq < cutforcesq) {
-      F_FLOAT p = sqrt(rsq)*rdr + 1.0;
+      F_FLOAT p = Kokkos::Experimental::sqrt(rsq)*rdr + 1.0;
       int m = static_cast<int> (p);
       m = MIN(m,nr-1);
       p -= m;
@@ -651,7 +651,7 @@ void PairEAMAlloyKokkos<DeviceType>::operator()(TagPairEAMAlloyKernelAB<EFLAG>, 
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq < cutforcesq) {
-      F_FLOAT p = sqrt(rsq)*rdr + 1.0;
+      F_FLOAT p = Kokkos::Experimental::sqrt(rsq)*rdr + 1.0;
       int m = static_cast<int> (p);
       m = MIN(m,nr-1);
       p -= m;
@@ -729,7 +729,7 @@ void PairEAMAlloyKokkos<DeviceType>::operator()(TagPairEAMAlloyKernelC<NEIGHFLAG
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq < cutforcesq) {
-      const F_FLOAT r = sqrt(rsq);
+      const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
       F_FLOAT p = r*rdr + 1.0;
       int m = static_cast<int> (p);
       m = MIN(m,nr-1);

@@ -117,7 +117,7 @@ void PairDPDExtTstatKokkos<DeviceType>::compute(int eflagin, int vflagin)
     for (int i = 1; i <= atom->ntypes; i++)
       for (int j = i; j <= atom->ntypes; j++) {
         k_params.h_view(i,j).sigma = k_params.h_view(j,i).sigma =
-          sqrt(2.0*boltz*temperature*gamma[i][j]);
+          Kokkos::Experimental::sqrt(2.0*boltz*temperature*gamma[i][j]);
       }
   }
   k_params.template modify<LMPHostType>();
@@ -155,7 +155,7 @@ void PairDPDExtTstatKokkos<DeviceType>::compute(int eflagin, int vflagin)
   special_rf[3] = sqrt(force->special_lj[3]);
 
   nlocal = atom->nlocal;
-  dtinvsqrt = 1.0/sqrt(update->dt);
+  dtinvsqrt = 1.0/Kokkos::Experimental::sqrt(update->dt);
 
   NeighListKokkos<DeviceType>* k_list = static_cast<NeighListKokkos<DeviceType>*>(list);
   d_numneigh = k_list->d_numneigh;
@@ -267,7 +267,7 @@ void PairDPDExtTstatKokkos<DeviceType>::operator() (TagDPDExtTstatKokkos<NEIGHFL
     rsq = delx*delx + dely*dely + delz*delz;
     jtype = type(j);
     if (rsq < d_cutsq(itype,jtype)) {
-      r = sqrt(rsq);
+      r = Kokkos::Experimental::sqrt(rsq);
       if (r < EPSILON) continue;     // r can be 0.0 in DPD systems
       rinv = 1.0/r;
       delvx = vxtmp - v(j,0);
@@ -288,8 +288,8 @@ void PairDPDExtTstatKokkos<DeviceType>::operator() (TagDPDExtTstatKokkos<NEIGHFL
       P[2][2] = 1.0 - delz*delz*rinv*rinv;
 
       wd = 1.0 - r/params(itype,jtype).cut;
-      wdPar = pow(wd,params(itype,jtype).ws);
-      wdPerp = pow(wd,params(itype,jtype).wsT);
+      wdPar = Kokkos::Experimental::pow(wd,params(itype,jtype).ws);
+      wdPerp = Kokkos::Experimental::pow(wd,params(itype,jtype).wsT);
 
       randnum  = rand_gen.normal();
       randnumx = rand_gen.normal();

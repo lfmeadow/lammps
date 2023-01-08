@@ -250,7 +250,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
 
     for (i = 0; i < 3; i++) {
       rmag2[i] = delr[i][0]*delr[i][0] + delr[i][1]*delr[i][1] + delr[i][2]*delr[i][2];
-      rmag[i] = sqrt(rmag2[i]);
+      rmag[i] = Kokkos::Experimental::sqrt(rmag2[i]);
       rinvmag[i] = 1.0/rmag[i];
     }
 
@@ -263,7 +263,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
     costheta[2] = (delr[0][0]*delr[2][0] + delr[0][1]*delr[2][1] +
                    delr[0][2]*delr[2][2]) / (rmag[0]*rmag[2]);
 
-    // sin and cos of improper
+    // Kokkos::Experimental::sin and Kokkos::Experimental::cos of improper
 
     F_FLOAT s1 = 1.0 - costheta[1]*costheta[1];
     if (s1 < SMALL) s1 = SMALL;
@@ -273,7 +273,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
     if (s2 < SMALL) s2 = SMALL;
     s2 = 1.0 / s2;
 
-    F_FLOAT s12 = sqrt(s1*s2);
+    F_FLOAT s12 = Kokkos::Experimental::sqrt(s1*s2);
     F_FLOAT c = (costheta[1]*costheta[2] + costheta[0]) * s12;
 
     // error check
@@ -288,7 +288,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
     if (c > 1.0) c = 1.0;
     if (c < -1.0) c = -1.0;
 
-    F_FLOAT s = sqrt(1.0 - c*c);
+    F_FLOAT s = Kokkos::Experimental::sqrt(1.0 - c*c);
     if (s < SMALL) s = SMALL;
 
     for (i = 0; i < 3; i++) {
@@ -296,7 +296,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
       if (costheta[i] < -1.0) costheta[i] = -1.0;
       theta[i] = acos(costheta[i]);
       cossqtheta[i] = costheta[i]*costheta[i];
-      sintheta[i] = sin(theta[i]);
+      sintheta[i] = Kokkos::Experimental::sin(theta[i]);
       invstheta[i] = 1.0/sintheta[i];
       sinsqtheta[i] = sintheta[i]*sintheta[i];
     }
@@ -385,7 +385,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
 
     tt1 = costheta[0] / rmag2[0];
     tt3 = costheta[0] / rmag2[1];
-    sc1 = 1.0 / sqrt(1.0 - cossqtheta[0]);
+    sc1 = 1.0 / Kokkos::Experimental::sqrt(1.0 - cossqtheta[0]);
 
     dthetadr[0][0][0] = sc1 * ((tt1 * delr[0][0]) -
                                (delr[1][0] * rinvmag[0] * rinvmag[1]));
@@ -417,7 +417,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
 
     tt1 = costheta[1] / rmag2[1];
     tt3 = costheta[1] / rmag2[2];
-    sc1 = 1.0 / sqrt(1.0 - cossqtheta[1]);
+    sc1 = 1.0 / Kokkos::Experimental::sqrt(1.0 - cossqtheta[1]);
 
     dthetadr[1][2][0] = sc1 * ((tt1 * delr[1][0]) -
                                (delr[2][0] * rinvmag[1] * rinvmag[2]));
@@ -448,7 +448,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
 
     tt1 = costheta[2] / rmag2[0];
     tt3 = costheta[2] / rmag2[2];
-    sc1 = 1.0 / sqrt(1.0 - cossqtheta[2]);
+    sc1 = 1.0 / Kokkos::Experimental::sqrt(1.0 - cossqtheta[2]);
 
     dthetadr[2][0][0] = sc1 * ((tt1 * delr[0][0]) -
                                (delr[2][0] * rinvmag[0] * rinvmag[2]));
@@ -475,7 +475,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
     dthetadr[2][3][2] = sc1 * ((tt3 * delr[2][2]) -
                                (delr[0][2] * rinvmag[2] * rinvmag[0]));
 
-    // compute d( 1 / sin(theta))/dr
+    // compute d( 1 / Kokkos::Experimental::sin(theta))/dr
     // i = angle, j = atom, k = direction
 
     for (i = 0; i < 3; i++) {
@@ -485,7 +485,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
           dinvsth[i][j][k] = cossin2 * dthetadr[i][j][k];
     }
 
-    // compute d(1 / sin(theta) * |r_AB| * |r_CB| * |r_DB|)/dr
+    // compute d(1 / Kokkos::Experimental::sin(theta) * |r_AB| * |r_CB| * |r_DB|)/dr
     // i = angle, j = atom
 
     for (i = 0; i < 4; i++)
@@ -589,11 +589,11 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2Compute<NEWTO
     for (i = 0; i < 4; i++)
       for (j = 0; j < 3; j++) {
         ftmp = (fdot[0][i][j] * invs3r[0]) + (dinvs3r[0][i][j] * dotCBDBAB);
-        dchi[0][i][j] = ftmp / cos(chiABCD);
+        dchi[0][i][j] = ftmp / Kokkos::Experimental::cos(chiABCD);
         ftmp = (fdot[1][i][j] * invs3r[1]) + (dinvs3r[1][i][j] * dotDBABCB);
-        dchi[1][i][j] = ftmp / cos(chiCBDA);
+        dchi[1][i][j] = ftmp / Kokkos::Experimental::cos(chiCBDA);
         ftmp = (fdot[2][i][j] * invs3r[2]) + (dinvs3r[2][i][j] * dotABCBDB);
-        dchi[2][i][j] = ftmp / cos(chiDBAC);
+        dchi[2][i][j] = ftmp / Kokkos::Experimental::cos(chiDBAC);
         dtotalchi[i][j] = (dchi[0][i][j]+dchi[1][i][j]+dchi[2][i][j]) / 3.0;
       }
 
@@ -700,11 +700,11 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2AngleAngle<NE
     // bond lengths
 
     rABmag2 = delxAB*delxAB + delyAB*delyAB + delzAB*delzAB;
-    rAB = sqrt(rABmag2);
+    rAB = Kokkos::Experimental::sqrt(rABmag2);
     rBCmag2 = delxBC*delxBC + delyBC*delyBC + delzBC*delzBC;
-    rBC = sqrt(rBCmag2);
+    rBC = Kokkos::Experimental::sqrt(rBCmag2);
     rBDmag2 = delxBD*delxBD + delyBD*delyBD + delzBD*delzBD;
-    rBD = sqrt(rBDmag2);
+    rBD = Kokkos::Experimental::sqrt(rBDmag2);
 
     // angle ABC, ABD, CBD
 
@@ -742,7 +742,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2AngleAngle<NE
 
     // angle ABC
 
-    sc1 = sqrt(1.0/(1.0 - costhABC*costhABC));
+    sc1 = Kokkos::Experimental::sqrt(1.0/(1.0 - costhABC*costhABC));
     t1 = costhABC / rABmag2;
     t3 = costhABC / rBCmag2;
     r12 = 1.0 / (rAB * rBC);
@@ -762,7 +762,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2AngleAngle<NE
 
     // angle CBD
 
-    sc1 = sqrt(1.0/(1.0 - costhCBD*costhCBD));
+    sc1 = Kokkos::Experimental::sqrt(1.0/(1.0 - costhCBD*costhCBD));
     t1 = costhCBD / rBCmag2;
     t3 = costhCBD / rBDmag2;
     r12 = 1.0 / (rBC * rBD);
@@ -782,7 +782,7 @@ void ImproperClass2Kokkos<DeviceType>::operator()(TagImproperClass2AngleAngle<NE
 
     // angle ABD
 
-    sc1 = sqrt(1.0/(1.0 - costhABD*costhABD));
+    sc1 = Kokkos::Experimental::sqrt(1.0/(1.0 - costhABD*costhABD));
     t1 = costhABD / rABmag2;
     t3 = costhABD / rBDmag2;
     r12 = 1.0 / (rAB * rBD);

@@ -91,7 +91,7 @@ void PairCoulWolfKokkos<DeviceType>::compute(int eflag_in, int vflag_in)
   // shifted coulombic energy
 
   e_shift = erfc(alf*cut_coul)/cut_coul;
-  f_shift = -(e_shift+ 2.0*alf/MY_PIS * exp(-alf*alf*cut_coul*cut_coul)) /
+  f_shift = -(e_shift+ 2.0*alf/MY_PIS * Kokkos::Experimental::exp(-alf*alf*cut_coul*cut_coul)) /
     cut_coul;
 
   x = atomKK->k_x.view<DeviceType>();
@@ -253,10 +253,10 @@ void PairCoulWolfKokkos<DeviceType>::operator()(TagPairCoulWolfKernelA<NEIGHFLAG
     const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
 
     if (rsq < cut_coulsq) {
-      const F_FLOAT r = sqrt(rsq);
+      const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
       const F_FLOAT prefactor = qqrd2e*qtmp*q[j]/r;
       const F_FLOAT erfcc = erfc(alf*r);
-      const F_FLOAT erfcd = exp(-alf*alf*r*r);
+      const F_FLOAT erfcd = Kokkos::Experimental::exp(-alf*alf*r*r);
       const F_FLOAT v_sh = (erfcc - e_shift*r) * prefactor;
       const F_FLOAT dvdrr = (erfcc/rsq + 2.0*alf/MY_PIS * erfcd/r) + f_shift;
       F_FLOAT forcecoul = dvdrr*rsq*prefactor;

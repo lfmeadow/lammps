@@ -190,7 +190,7 @@ void FixLangevinKokkos<DeviceType>::post_force(int /*vflag*/)
   dt = update->dt;
   mvv2e = force->mvv2e;
   ftm2v = force->ftm2v;
-  fran_prop_const = sqrt(24.0*boltz/t_period/dt/mvv2e);
+  fran_prop_const = Kokkos::Experimental::sqrt(24.0*boltz/t_period/dt/mvv2e);
 
   compute_target(); // modifies tforce vector, hence sync here
   k_tforce.template sync<DeviceType>();
@@ -567,12 +567,12 @@ FSUM FixLangevinKokkos<DeviceType>::post_force_item(int i) const
 
   if (mask[i] & groupbit) {
     rand_type rand_gen = rand_pool.get_state();
-    if (Tp_TSTYLEATOM) tsqrt_t = sqrt(d_tforce[i]);
+    if (Tp_TSTYLEATOM) tsqrt_t = Kokkos::Experimental::sqrt(d_tforce[i]);
     if (Tp_RMASS) {
       gamma1 = -rmass[i] / t_period / ftm2v;
-      gamma2 = sqrt(rmass[i]) * fran_prop_const / ftm2v;
+      gamma2 = Kokkos::Experimental::sqrt(rmass[i]) * fran_prop_const / ftm2v;
       gamma1 *= 1.0/d_ratio[type[i]];
-      gamma2 *= 1.0/sqrt(d_ratio[type[i]]) * tsqrt_t;
+      gamma2 *= 1.0/Kokkos::Experimental::sqrt(d_ratio[type[i]]) * tsqrt_t;
     } else {
       gamma1 = d_gfactor1[type[i]];
       gamma2 = d_gfactor2[type[i]] * tsqrt_t;
@@ -686,14 +686,14 @@ void FixLangevinKokkos<DeviceType>::compute_target()
 
   if (tstyle == CONSTANT) {
     t_target = t_start + delta * (t_stop-t_start);
-    tsqrt = sqrt(t_target);
+    tsqrt = Kokkos::Experimental::sqrt(t_target);
   } else {
     modify->clearstep_compute();
     if (tstyle == EQUAL) {
       t_target = input->variable->compute_equal(tvar);
       if (t_target < 0.0)
         error->one(FLERR,"Fix langevin variable returned negative temperature");
-      tsqrt = sqrt(t_target);
+      tsqrt = Kokkos::Experimental::sqrt(t_target);
     } else {
       if (atom->nmax > maxatom2) {
         maxatom2 = atom->nmax;
@@ -721,10 +721,10 @@ void FixLangevinKokkos<DeviceType>::reset_dt()
 {
   if (atomKK->mass) {
     for (int i = 1; i <= atomKK->ntypes; i++) {
-      h_gfactor2[i] = sqrt(atomKK->mass[i]) *
-        sqrt(24.0*force->boltz/t_period/update->dt/force->mvv2e) /
+      h_gfactor2[i] = Kokkos::Experimental::sqrt(atomKK->mass[i]) *
+        Kokkos::Experimental::sqrt(24.0*force->boltz/t_period/update->dt/force->mvv2e) /
         force->ftm2v;
-      h_gfactor2[i] *= 1.0/sqrt(h_ratio[i]);
+      h_gfactor2[i] *= 1.0/Kokkos::Experimental::sqrt(h_ratio[i]);
     }
     k_gfactor2.template modify<LMPHostType>();
   }

@@ -144,7 +144,7 @@ F_FLOAT PairLJExpandKokkos<DeviceType>::
 compute_fpair(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
               const int& itype, const int& jtype) const {
 
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT rshift = r - (STACKPARAMS?m_params[itype][jtype].shift:params(itype,jtype).shift);
   const F_FLOAT rshiftsq = rshift*rshift;
   const F_FLOAT r2inv = 1.0/rshiftsq;
@@ -165,7 +165,7 @@ F_FLOAT PairLJExpandKokkos<DeviceType>::
 compute_evdwl(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
               const int& itype, const int& jtype) const {
 
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT rshift = r - (STACKPARAMS?m_params[itype][jtype].shift:params(itype,jtype).shift);
   const F_FLOAT rshiftsq = rshift*rshift;
   const F_FLOAT r2inv = 1.0/rshiftsq;

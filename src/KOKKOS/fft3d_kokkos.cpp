@@ -814,7 +814,7 @@ void FFT3dKokkos<DeviceType>::bifactor(int n, int *factor1, int *factor2)
 {
   int n1,n2,facmax;
 
-  facmax = static_cast<int> (sqrt((double) n));
+  facmax = static_cast<int> (Kokkos::Experimental::sqrt((double) n));
 
   for (n1 = facmax; n1 > 0; n1--) {
     n2 = n/n1;

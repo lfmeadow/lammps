@@ -137,7 +137,7 @@ void FixACKS2ReaxFFKokkos<DeviceType>::init_shielding_k()
 
   for( i = 1; i <= ntypes; ++i )
     for( j = 1; j <= ntypes; ++j )
-      k_shield.h_view(i,j) = pow( gamma[i] * gamma[j], -1.5 );
+      k_shield.h_view(i,j) = Kokkos::Experimental::pow( gamma[i] * gamma[j], -1.5 );
 
   k_shield.template modify<LMPHostType>();
   k_shield.template sync<DeviceType>();
@@ -613,7 +613,7 @@ void FixACKS2ReaxFFKokkos<DeviceType>::compute_h_item(int ii, int &m_fill, const
       if (rsq > cutsq) continue;
 
       if (final) {
-        const F_FLOAT r = sqrt(rsq);
+        const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
         d_jlist(m_fill) = j;
         const F_FLOAT shldij = d_shield(itype,jtype);
         d_val(m_fill) = calculate_H_k(r,shldij);
@@ -798,7 +798,7 @@ void FixACKS2ReaxFFKokkos<DeviceType>::compute_h_team(
                       if (valid) {
                         s_jlist(team.team_rank(), idx) = j;
                         s_jtype(team.team_rank(), idx) = jtype;
-                        s_r(team.team_rank(), idx) = sqrt(rsq);
+                        s_r(team.team_rank(), idx) = Kokkos::Experimental::sqrt(rsq);
                         m_fill++;
                       }
                     }
@@ -853,7 +853,7 @@ double FixACKS2ReaxFFKokkos<DeviceType>::calculate_H_k(const F_FLOAT &r, const F
   taper = taper * r + d_tap[0];
 
   denom = r * r * r + shld;
-  denom = pow(denom,1.0/3.0);
+  denom = Kokkos::Experimental::pow(denom,1.0/3.0);
 
   return taper * EV_TO_KCAL_PER_MOL / denom;
 }
@@ -917,7 +917,7 @@ void FixACKS2ReaxFFKokkos<DeviceType>::compute_x_item(int ii, int &m_fill, const
       if (rsq > bcutoff2) continue;
 
       if (final) {
-        const F_FLOAT r = sqrt(rsq);
+        const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
         d_jlist_X(m_fill) = j;
         const F_FLOAT X_val = calculate_X_k(r,bcutoff);
         d_val_X(m_fill) = X_val;
@@ -1111,7 +1111,7 @@ void FixACKS2ReaxFFKokkos<DeviceType>::compute_x_team(
                       if (valid) {
                         s_jlist(team.team_rank(), idx) = j;
                         s_jtype(team.team_rank(), idx) = jtype;
-                        s_r(team.team_rank(), idx) = sqrt(rsq);
+                        s_r(team.team_rank(), idx) = Kokkos::Experimental::sqrt(rsq);
                         m_fill++;
                       }
                     }
@@ -1228,14 +1228,14 @@ int FixACKS2ReaxFFKokkos<DeviceType>::bicgstab_solve()
   Kokkos::parallel_reduce(Kokkos::RangePolicy<DeviceType,TagACKS2Norm1>(0,nn),*this,my_norm);
   norm_sqr = 0.0;
   MPI_Allreduce( &my_norm, &norm_sqr, 1, MPI_DOUBLE, MPI_SUM, world );
-  bnorm = sqrt(norm_sqr);
+  bnorm = Kokkos::Experimental::sqrt(norm_sqr);
 
   // rnorm = parallel_norm( r, nn);
   my_norm = 0.0;
   Kokkos::parallel_reduce(Kokkos::RangePolicy<DeviceType,TagACKS2Norm2>(0,nn),*this,my_norm);
   norm_sqr = 0.0;
   MPI_Allreduce( &my_norm, &norm_sqr, 1, MPI_DOUBLE, MPI_SUM, world );
-  rnorm = sqrt(norm_sqr);
+  rnorm = Kokkos::Experimental::sqrt(norm_sqr);
 
   if (bnorm == 0.0 ) bnorm = 1.0;
   deep_copy(d_r_hat,d_r);
@@ -1352,7 +1352,7 @@ int FixACKS2ReaxFFKokkos<DeviceType>::bicgstab_solve()
     my_dot = dot_sqr = 0.0;
     Kokkos::parallel_reduce(Kokkos::RangePolicy<DeviceType,TagACKS2Norm3>(0,nn),*this,my_dot);
     MPI_Allreduce( &my_dot, &dot_sqr, 1, MPI_DOUBLE, MPI_SUM, world );
-    rnorm = sqrt(dot_sqr);
+    rnorm = Kokkos::Experimental::sqrt(dot_sqr);
 
     if (omega == 0) break;
     rho_old = rho;

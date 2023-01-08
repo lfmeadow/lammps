@@ -449,13 +449,13 @@ class PPPMKokkos : public PPPM, public KokkosBaseFFT {
 
 /* ----------------------------------------------------------------------
    denominator for Hockney-Eastwood Green's function
-     of x,y,z = sin(kx*deltax/2), etc
+     of x,y,z = Kokkos::Experimental::sin(kx*deltax/2), etc
 
             inf                 n-1
    S(n,k) = Sum  W(k+pi*j)**2 = Sum b(l)*(z*z)**l
            j=-inf               l=0
 
-          = -(z*z)**n /(2n-1)! * (d/dx)**(2n-1) cot(x)  at z = sin(x)
+          = -(z*z)**n /(2n-1)! * (d/dx)**(2n-1) cot(x)  at z = Kokkos::Experimental::sin(x)
    gf_b = denominator expansion coeffs
 ------------------------------------------------------------------------- */
 

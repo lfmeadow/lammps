@@ -158,7 +158,7 @@ KOKKOS_INLINE_FUNCTION void MEAMKokkos<DeviceType>::operator()(TagMEAMForce<NEIG
       delij[2] = x(j, 2) - zitmp;
       rij2 = delij[0] * delij[0] + delij[1] * delij[1] + delij[2] * delij[2];
       if (rij2 < cutforcesq) {
-        rij = sqrt(rij2);
+        rij = Kokkos::Experimental::sqrt(rij2);
         recip = 1.0 / rij;
 
         // Compute phi and phip

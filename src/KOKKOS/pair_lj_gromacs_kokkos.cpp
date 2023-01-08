@@ -164,7 +164,7 @@ compute_fpair(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
      (STACKPARAMS?m_params[itype][jtype].lj2:params(itype,jtype).lj2));
 
   if (rsq > (STACKPARAMS?m_params[itype][jtype].cut_inner_sq:params(itype,jtype).cut_inner_sq)) {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT tlj = r - (STACKPARAMS?m_params[itype][jtype].cut_inner:params(itype,jtype).cut_inner);
     const F_FLOAT fswitch = r*tlj*tlj*
             ((STACKPARAMS?m_params[itype][jtype].ljsw1:params(itype,jtype).ljsw1) +
@@ -192,7 +192,7 @@ compute_evdwl(const F_FLOAT& rsq, const int& /*i*/, const int& /*j*/,
   englj += (STACKPARAMS?m_params[itype][jtype].ljsw5:params(itype,jtype).ljsw5);
 
   if (rsq > (STACKPARAMS?m_params[itype][jtype].cut_inner_sq:params(itype,jtype).cut_inner_sq)) {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT tlj = r - (STACKPARAMS?m_params[itype][jtype].cut_inner:params(itype,jtype).cut_inner);
     const F_FLOAT eswitch = tlj*tlj*tlj *
             ((STACKPARAMS?m_params[itype][jtype].ljsw3:params(itype,jtype).ljsw3) +

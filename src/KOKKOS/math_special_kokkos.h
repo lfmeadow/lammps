@@ -111,14 +111,14 @@ namespace MathSpecialKokkos {
   #endif
   }
 
-  /*! Fast implementation of exp(x) for little endian CPUs
+  /*! Fast implementation of Kokkos::Experimental::exp(x) for little endian CPUs
    *
-   *  This function implements an optimized version of exp(x) for little endian CPUs.
-   *  It calls the exp2_x86(x) function with a suitable prefactor to x to return exp(x).
+   *  This function implements an optimized version of Kokkos::Experimental::exp(x) for little endian CPUs.
+   *  It calls the exp2_x86(x) function with a suitable prefactor to x to return Kokkos::Experimental::exp(x).
    *  The implementation makes assumptions about the layout of double
    *  precision floating point numbers in memory and thus will only work on little
    *  endian CPUs.  If little endian cannot be safely detected, the result of
-   *  calling the exp(x) implementation in the standard math library will be returned.
+   *  calling the Kokkos::Experimental::exp(x) implementation in the standard math library will be returned.
    *
    *  \param   x argument
    *  \return  value of e^x as double precision number */
@@ -131,7 +131,7 @@ namespace MathSpecialKokkos {
       if (x > 1023.0/FM_DOUBLE_LOG2OFE) return INFINITY;
       return exp2_x86(FM_DOUBLE_LOG2OFE * x);
   #else
-      return ::exp(x);
+      return ::Kokkos::Experimental::exp(x);
   #endif
   }
 
@@ -139,9 +139,9 @@ namespace MathSpecialKokkos {
 
   extern double erfcx_y100(const double y100);
 
-  /*! Fast scaled error function complement exp(x*x)*erfc(x) for coul/long styles
+  /*! Fast scaled error function complement Kokkos::Experimental::exp(x*x)*erfc(x) for coul/long styles
    *
-   *  This is a portable fast implementation of exp(x*x)*erfc(x) that can be used
+   *  This is a portable fast implementation of Kokkos::Experimental::exp(x*x)*erfc(x) that can be used
    *  in coul/long pair styles as a replacement for the polynomial expansion that
    *  is/was widely used.  Unlike the polynomial expansion, that is only accurate
    *  at the level of single precision floating point it provides full double precision
@@ -156,14 +156,14 @@ namespace MathSpecialKokkos {
     if (x >= 0.0)
       return erfcx_y100(400.0 / (4.0 + x));
     else
-      return 2.0 * exp(x * x) - erfcx_y100(400.0 / (4.0 - x));
+      return 2.0 * Kokkos::Experimental::exp(x * x) - erfcx_y100(400.0 / (4.0 - x));
   }
 
-  /*! Fast implementation of exp(-x*x) for little endian CPUs for coul/long styles
+  /*! Fast implementation of Kokkos::Experimental::exp(-x*x) for little endian CPUs for coul/long styles
    *
-   *  This function implements an optimized version of exp(-x*x) based on exp2_x86()
+   *  This function implements an optimized version of Kokkos::Experimental::exp(-x*x) based on exp2_x86()
    *  for use with little endian CPUs. If little endian cannot be safely detected,
-   *  the result of calling the exp(-x*x) implementation in the standard math
+   *  the result of calling the Kokkos::Experimental::exp(-x*x) implementation in the standard math
    *  library will be returned.
    *
    *  \param   x argument
@@ -227,12 +227,12 @@ namespace MathSpecialKokkos {
     return (n > 0) ? yy : 1.0 / yy;
   }
 
-  /* Fast inline version of (sin(x)/x)^n as used by PPPM kspace styles
+  /* Fast inline version of (Kokkos::Experimental::sin(x)/x)^n as used by PPPM kspace styles
    *
-   * This is an optimized function to compute (sin(x)/x)^n as frequently used by PPPM.
+   * This is an optimized function to compute (Kokkos::Experimental::sin(x)/x)^n as frequently used by PPPM.
    *
    *  \param   n argument (integer). Expected to be positive.
-   *  \return  value of (sin(x)/x)^n */
+   *  \return  value of (Kokkos::Experimental::sin(x)/x)^n */
 
   KOKKOS_INLINE_FUNCTION
   static double powsinxx(const double &x, int n)
@@ -241,7 +241,7 @@ namespace MathSpecialKokkos {
 
     if (x == 0.0) return 1.0;
 
-    ww = sin(x) / x;
+    ww = Kokkos::Experimental::sin(x) / x;
 
     for (yy = 1.0; n != 0; n >>= 1, ww *= ww)
       if (n & 1) yy *= ww;

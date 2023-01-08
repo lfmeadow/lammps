@@ -467,9 +467,9 @@ compute_item(
       auto fpair = factor_lj * compute_fpair<DeviceType,TABSTYLE>(
           rsq,itype,jtype,d_table_const);
 
-      if (isite1 == isite2) fpair *= sqrt(mixWtSite1old_i * mixWtSite2old_j);
-      else fpair *= (sqrt(mixWtSite1old_i * mixWtSite2old_j) +
-                     sqrt(mixWtSite2old_i * mixWtSite1old_j));
+      if (isite1 == isite2) fpair *= Kokkos::Experimental::sqrt(mixWtSite1old_i * mixWtSite2old_j);
+      else fpair *= (Kokkos::Experimental::sqrt(mixWtSite1old_i * mixWtSite2old_j) +
+                     Kokkos::Experimental::sqrt(mixWtSite2old_i * mixWtSite1old_j));
 
       fx_i += delx*fpair;
       fy_i += dely*fpair;
@@ -488,13 +488,13 @@ compute_item(
 
       double evdwlOld;
       if (isite1 == isite2) {
-        evdwlOld = sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwl;
-        evdwl = sqrt(mixWtSite1_i*mixWtSite2_j)*evdwl;
+        evdwlOld = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*evdwl;
+        evdwl = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*evdwl;
       } else {
-        evdwlOld = (sqrt(mixWtSite1old_i*mixWtSite2old_j) +
-                    sqrt(mixWtSite2old_i*mixWtSite1old_j))*evdwl;
-        evdwl = (sqrt(mixWtSite1_i*mixWtSite2_j) +
-                 sqrt(mixWtSite2_i*mixWtSite1_j))*evdwl;
+        evdwlOld = (Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j) +
+                    Kokkos::Experimental::sqrt(mixWtSite2old_i*mixWtSite1old_j))*evdwl;
+        evdwl = (Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j) +
+                 Kokkos::Experimental::sqrt(mixWtSite2_i*mixWtSite1_j))*evdwl;
       }
       evdwlOld *= factor_lj;
       evdwl *= factor_lj;
@@ -1234,8 +1234,8 @@ double PairTableRXKokkos<DeviceType>::single(int i, int j, int itype, int jtype,
     fforce = factor_lj * value;
   }
 
-  if (isite1 == isite2) fforce = sqrt(mixWtSite1_i*mixWtSite2_j)*fforce;
-  else fforce = (sqrt(mixWtSite1_i*mixWtSite2_j) + sqrt(mixWtSite2_i*mixWtSite1_j))*fforce;
+  if (isite1 == isite2) fforce = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*fforce;
+  else fforce = (Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j) + sqrt(mixWtSite2_i*mixWtSite1_j))*fforce;
 
   if (tabstyle == LOOKUP)
     phi = tb->e[itable];
@@ -1245,8 +1245,8 @@ double PairTableRXKokkos<DeviceType>::single(int i, int j, int itype, int jtype,
     phi = a * tb->e[itable] + b * tb->e[itable+1] +
       ((a*a*a-a)*tb->e2[itable] + (b*b*b-b)*tb->e2[itable+1]) * tb->deltasq6;
 
-  if (isite1 == isite2) phi = sqrt(mixWtSite1_i*mixWtSite2_j)*phi;
-  else phi = (sqrt(mixWtSite1_i*mixWtSite2_j) + sqrt(mixWtSite2_i*mixWtSite1_j))*phi;
+  if (isite1 == isite2) phi = Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j)*phi;
+  else phi = (Kokkos::Experimental::sqrt(mixWtSite1_i*mixWtSite2_j) + sqrt(mixWtSite2_i*mixWtSite1_j))*phi;
 
   return factor_lj*phi;
 }

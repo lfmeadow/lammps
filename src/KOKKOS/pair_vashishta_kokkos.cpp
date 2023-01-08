@@ -631,15 +631,15 @@ void PairVashishtaKokkos<DeviceType>::twobody(const Param& param, const F_FLOAT&
                      const int& eflag, F_FLOAT& eng) const
 {
   F_FLOAT r,rinvsq,r4inv,r6inv,reta,lam1r,lam4r,vc2,vc3;
-  r = sqrt(rsq);
+  r = Kokkos::Experimental::sqrt(rsq);
   rinvsq = 1.0/rsq;
   r4inv = rinvsq*rinvsq;
   r6inv = rinvsq*r4inv;
-  reta = pow(r,-param.eta);
+  reta = Kokkos::Experimental::pow(r,-param.eta);
   lam1r = r*param.lam1inv;
   lam4r = r*param.lam4inv;
-  vc2 = param.zizj * exp(-lam1r)/r;
-  vc3 = param.mbigd * r4inv*exp(-lam4r);
+  vc2 = param.zizj * Kokkos::Experimental::exp(-lam1r)/r;
+  vc3 = param.mbigd * r4inv*Kokkos::Experimental::exp(-lam4r);
 
   fforce = (param.dvrc*r
       - (4.0*vc3 + lam4r*vc3+param.big6w*r6inv
@@ -663,19 +663,19 @@ void PairVashishtaKokkos<DeviceType>::threebody(const Param& paramij, const Para
   F_FLOAT rinv12,cs,delcs,delcssq,facexp,facrad,frad1,frad2,pcsinv,pcsinvsq,pcs;
   F_FLOAT facang,facang12,csfacang,csfac1,csfac2;
 
-  r1 = sqrt(rsq1);
+  r1 = Kokkos::Experimental::sqrt(rsq1);
   rinvsq1 = 1.0/rsq1;
   rainv1 = 1.0/(r1 - paramij.r0);
   gsrainv1 = paramij.gamma * rainv1;
   gsrainvsq1 = gsrainv1*rainv1/r1;
-  expgsrainv1 = exp(gsrainv1);
+  expgsrainv1 = Kokkos::Experimental::exp(gsrainv1);
 
-  r2 = sqrt(rsq2);
+  r2 = Kokkos::Experimental::sqrt(rsq2);
   rinvsq2 = 1.0/rsq2;
   rainv2 = 1.0/(r2 - paramik.r0);
   gsrainv2 = paramik.gamma * rainv2;
   gsrainvsq2 = gsrainv2*rainv2/r2;
-  expgsrainv2 = exp(gsrainv2);
+  expgsrainv2 = Kokkos::Experimental::exp(gsrainv2);
 
   rinv12 = 1.0/(r1*r2);
   cs = (delr1[0]*delr2[0] + delr1[1]*delr2[1] + delr1[2]*delr2[2]) * rinv12;
@@ -720,17 +720,17 @@ void PairVashishtaKokkos<DeviceType>::threebodyj(const Param& paramij, const Par
   F_FLOAT rinv12,cs,delcs,delcssq,facexp,facrad,frad1,pcsinv,pcsinvsq,pcs;
   F_FLOAT facang,facang12,csfacang,csfac1;
 
-  r1 = sqrt(rsq1);
+  r1 = Kokkos::Experimental::sqrt(rsq1);
   rinvsq1 = 1.0/rsq1;
   rainv1 = 1.0/(r1 - paramij.r0);
   gsrainv1 = paramij.gamma * rainv1;
   gsrainvsq1 = gsrainv1*rainv1/r1;
-  expgsrainv1 = exp(gsrainv1);
+  expgsrainv1 = Kokkos::Experimental::exp(gsrainv1);
 
-  r2 = sqrt(rsq2);
+  r2 = Kokkos::Experimental::sqrt(rsq2);
   rainv2 = 1.0/(r2 - paramik.r0);
   gsrainv2 = paramik.gamma * rainv2;
-  expgsrainv2 = exp(gsrainv2);
+  expgsrainv2 = Kokkos::Experimental::exp(gsrainv2);
 
   rinv12 = 1.0/(r1*r2);
   cs = (delr1[0]*delr2[0] + delr1[1]*delr2[1] + delr1[2]*delr2[2]) * rinv12;

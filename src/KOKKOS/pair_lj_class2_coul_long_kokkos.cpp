@@ -172,7 +172,7 @@ compute_fpair(const F_FLOAT& rsq, const int& i, const int&j,
   (void) i;
   (void) j;
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r3inv = r2inv*rinv;
   const F_FLOAT r6inv = r3inv*r3inv;
 
@@ -207,9 +207,9 @@ compute_fcoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
     }
     return forcecoul/rsq;
   } else {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT grij = g_ewald * r;
-    const F_FLOAT expm2 = exp(-grij*grij);
+    const F_FLOAT expm2 = Kokkos::Experimental::exp(-grij*grij);
     const F_FLOAT t = 1.0 / (1.0 + EWALD_P*grij);
     const F_FLOAT rinv = 1.0/r;
     const F_FLOAT erfc = t * (A1+t*(A2+t*(A3+t*(A4+t*A5)))) * expm2;
@@ -233,7 +233,7 @@ compute_evdwl(const F_FLOAT& rsq, const int& i, const int&j,
   (void) i;
   (void) j;
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r3inv = r2inv*rinv;
   const F_FLOAT r6inv = r3inv*r3inv;
 
@@ -266,9 +266,9 @@ compute_ecoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
     }
     return ecoul;
   } else {
-    const F_FLOAT r = sqrt(rsq);
+    const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
     const F_FLOAT grij = g_ewald * r;
-    const F_FLOAT expm2 = exp(-grij*grij);
+    const F_FLOAT expm2 = Kokkos::Experimental::exp(-grij*grij);
     const F_FLOAT t = 1.0 / (1.0 + EWALD_P*grij);
     const F_FLOAT erfc = t * (A1+t*(A2+t*(A3+t*(A4+t*A5)))) * expm2;
     const F_FLOAT prefactor = qqrd2e * qtmp*q[j]/r;

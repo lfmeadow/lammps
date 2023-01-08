@@ -257,9 +257,9 @@ void PairCoulDSFKokkos<DeviceType>::operator()(TagPairCoulDSFKernelA<NEIGHFLAG,N
 
 
       const F_FLOAT r2inv = 1.0/rsq;
-      const F_FLOAT r = sqrt(rsq);
+      const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
       const F_FLOAT prefactor = factor_coul * qqrd2e*qtmp*q[j]/r;
-      const F_FLOAT erfcd = exp(-alpha*alpha*rsq);
+      const F_FLOAT erfcd = Kokkos::Experimental::exp(-alpha*alpha*rsq);
       const F_FLOAT t = 1.0 / (1.0 + EWALD_P*alpha*r);
       const F_FLOAT erfcc = t * (A1+t*(A2+t*(A3+t*(A4+t*A5)))) * erfcd;
       const F_FLOAT forcecoul = prefactor * (erfcc/r + 2.0*alpha/MY_PIS * erfcd +

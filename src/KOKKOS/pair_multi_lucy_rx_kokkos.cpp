@@ -331,9 +331,9 @@ void PairMultiLucyRXKokkos<DeviceType>::operator()(TagPairMultiLucyRXCompute<NEI
         //A_j = tb->f[jtable];
         A_j = d_table_const.f(tidx,jtable);
 
-        const double rfactor = 1.0-sqrt(rsq/d_cutsq(itype,jtype));
+        const double rfactor = 1.0-Kokkos::Experimental::sqrt(rsq/d_cutsq(itype,jtype));
         fpair = 0.5*(A_i + A_j)*(4.0-3.0*rfactor)*rfactor*rfactor*rfactor;
-        fpair /= sqrt(rsq);
+        fpair /= Kokkos::Experimental::sqrt(rsq);
 
       } else if (TABSTYLE == LINEAR) {
 
@@ -363,14 +363,14 @@ void PairMultiLucyRXKokkos<DeviceType>::operator()(TagPairMultiLucyRXCompute<NEI
         //A_j = tb->f[jtable] + fraction_j*tb->df[jtable];
         A_j = d_table_const.f(tidx,jtable) + fraction_j*d_table_const.df(tidx,jtable);
 
-        const double rfactor = 1.0-sqrt(rsq/d_cutsq(itype,jtype));
+        const double rfactor = 1.0-Kokkos::Experimental::sqrt(rsq/d_cutsq(itype,jtype));
         fpair = 0.5*(A_i + A_j)*(4.0-3.0*rfactor)*rfactor*rfactor*rfactor;
-        fpair /= sqrt(rsq);
+        fpair /= Kokkos::Experimental::sqrt(rsq);
 
       } else k_error_flag.template view<DeviceType>()() = 3;
 
-      if (isite1 == isite2) fpair = sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpair;
-      else fpair = (sqrt(mixWtSite1old_i*mixWtSite2old_j) + sqrt(mixWtSite2old_i*mixWtSite1old_j))*fpair;
+      if (isite1 == isite2) fpair = Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j)*fpair;
+      else fpair = (Kokkos::Experimental::sqrt(mixWtSite1old_i*mixWtSite2old_j) + sqrt(mixWtSite2old_i*mixWtSite1old_j))*fpair;
 
       fx_i += delx*fpair;
       fy_i += dely*fpair;
@@ -453,7 +453,7 @@ void PairMultiLucyRXKokkos<DeviceType>::computeLocalDensity()
 
   // Special cut-off values for when there's only one type.
   cutsq_type11 = cutsq[1][1];
-  rcut_type11 = sqrt(cutsq_type11);
+  rcut_type11 = Kokkos::Experimental::sqrt(cutsq_type11);
   factor_type11 = 84.0/(5.0*MY_PI*rcut_type11*rcut_type11*rcut_type11);
 
   // zero out density
@@ -548,7 +548,7 @@ void PairMultiLucyRXKokkos<DeviceType>::operator()(TagPairMultiLucyRXComputeLoca
     if (ONE_TYPE) {
       if (rsq < cutsq_type11) {
         const double rcut = rcut_type11;
-        const double r_over_rcut = sqrt(rsq) / rcut;
+        const double r_over_rcut = Kokkos::Experimental::sqrt(rsq) / rcut;
         const double tmpFactor = 1.0 - r_over_rcut;
         const double tmpFactor4 = tmpFactor*tmpFactor*tmpFactor*tmpFactor;
         const double factor = factor_type11*(1.0 + 1.5*r_over_rcut)*tmpFactor4;
@@ -557,10 +557,10 @@ void PairMultiLucyRXKokkos<DeviceType>::operator()(TagPairMultiLucyRXComputeLoca
           a_rho[j] += factor;
       }
     } else if (rsq < d_cutsq(itype,jtype)) {
-      const double rcut = sqrt(d_cutsq(itype,jtype));
-      const double tmpFactor = 1.0-sqrt(rsq)/rcut;
+      const double rcut = Kokkos::Experimental::sqrt(d_cutsq(itype,jtype));
+      const double tmpFactor = 1.0-Kokkos::Experimental::sqrt(rsq)/rcut;
       const double tmpFactor4 = tmpFactor*tmpFactor*tmpFactor*tmpFactor;
-      const double factor = (84.0/(5.0*MY_PI*rcut*rcut*rcut))*(1.0+3.0*sqrt(rsq)/(2.0*rcut))*tmpFactor4;
+      const double factor = (84.0/(5.0*MY_PI*rcut*rcut*rcut))*(1.0+3.0*Kokkos::Experimental::sqrt(rsq)/(2.0*rcut))*tmpFactor4;
       rho_i_contrib += factor;
       if ((NEIGHFLAG==HALF || NEIGHFLAG==HALFTHREAD) && (NEWTON_PAIR || j < nlocal))
         a_rho[j] += factor;

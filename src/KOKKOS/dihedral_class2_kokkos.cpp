@@ -232,11 +232,11 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // distance: c0 calculation
 
   const F_FLOAT r1mag2 = vb1x*vb1x + vb1y*vb1y + vb1z*vb1z;
-  const F_FLOAT r1 = sqrt(r1mag2);
+  const F_FLOAT r1 = Kokkos::Experimental::sqrt(r1mag2);
   const F_FLOAT r2mag2 = vb2x*vb2x + vb2y*vb2y + vb2z*vb2z;
-  const F_FLOAT r2 = sqrt(r2mag2);
+  const F_FLOAT r2 = Kokkos::Experimental::sqrt(r2mag2);
   const F_FLOAT r3mag2 = vb3x*vb3x + vb3y*vb3y + vb3z*vb3z;
-  const F_FLOAT r3 = sqrt(r3mag2);
+  const F_FLOAT r3 = Kokkos::Experimental::sqrt(r3mag2);
 
   const F_FLOAT sb1 = 1.0/r1mag2;
   const F_FLOAT rb1 = 1.0/r1;
@@ -260,15 +260,15 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   costh23 = MAX(MIN(costh23, 1.0), -1.0);
   c0 = costh13;
 
-  // cos and sin of 2 angles and final c
+  // Kokkos::Experimental::cos and Kokkos::Experimental::sin of 2 angles and final c
 
   F_FLOAT sin2 = MAX(1.0 - costh12*costh12,0.0);
-  F_FLOAT sc1 = sqrt(sin2);
+  F_FLOAT sc1 = Kokkos::Experimental::sqrt(sin2);
   if (sc1 < SMALL) sc1 = SMALL;
   sc1 = 1.0/sc1;
 
   sin2 = MAX(1.0 - costh23*costh23,0.0);
-  F_FLOAT sc2 = sqrt(sin2);
+  F_FLOAT sc2 = Kokkos::Experimental::sqrt(sin2);
   if (sc2 < SMALL) sc2 = SMALL;
   sc2 = 1.0/sc2;
 
@@ -287,7 +287,7 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   const F_FLOAT cosphi = c;
   F_FLOAT phi = acos(c);
 
-  F_FLOAT sinphi = sqrt(1.0 - c*c);
+  F_FLOAT sinphi = Kokkos::Experimental::sqrt(1.0 - c*c);
   sinphi = MAX(sinphi,SMALL);
 
   // n123 = vb1 x vb2
@@ -318,7 +318,7 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   const F_FLOAT sz2  = a12*vb1z + a22*vb2z + a23*vb3z;
   const F_FLOAT sz12 = a13*vb1z + a23*vb2z + a33*vb3z;
 
-  // set up d(cos(phi))/d(r) and dphi/dr arrays
+  // set up d(Kokkos::Experimental::cos(phi))/d(r) and dphi/dr arrays
 
   F_FLOAT dcosphidr[4][3], dphidr[4][3];
 
@@ -347,12 +347,12 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   const F_FLOAT dphi2 = 2.0*phi - d_phi2[type];
   const F_FLOAT dphi3 = 3.0*phi - d_phi3[type];
 
-  if (eflag) edihedral = d_k1[type]*(1.0 - cos(dphi1)) +
-                     d_k2[type]*(1.0 - cos(dphi2)) +
-                     d_k3[type]*(1.0 - cos(dphi3));
+  if (eflag) edihedral = d_k1[type]*(1.0 - Kokkos::Experimental::cos(dphi1)) +
+                     d_k2[type]*(1.0 - Kokkos::Experimental::cos(dphi2)) +
+                     d_k3[type]*(1.0 - Kokkos::Experimental::cos(dphi3));
 
-  const F_FLOAT de_dihedral = d_k1[type]*sin(dphi1) + 2.0*d_k2[type]*sin(dphi2) +
-      3.0*d_k3[type]*sin(dphi3);
+  const F_FLOAT de_dihedral = d_k1[type]*Kokkos::Experimental::sin(dphi1) + 2.0*d_k2[type]*sin(dphi2) +
+      3.0*d_k3[type]*Kokkos::Experimental::sin(dphi3);
 
   // torsion forces on all 4 atoms
 
@@ -449,8 +449,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // mid-bond/torsion coupling
   // energy on bond2 (middle bond)
 
-  F_FLOAT cos2phi = cos(2.0*phi);
-  F_FLOAT cos3phi = cos(3.0*phi);
+  F_FLOAT cos2phi = Kokkos::Experimental::cos(2.0*phi);
+  F_FLOAT cos3phi = Kokkos::Experimental::cos(3.0*phi);
 
   F_FLOAT bt1 = d_mbt_f1[type] * cosphi;
   F_FLOAT bt2 = d_mbt_f2[type] * cos2phi;
@@ -462,8 +462,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // force on bond2
 
   bt1 = -d_mbt_f1[type] * sinphi;
-  bt2 = -2.0 * d_mbt_f2[type] * sin(2.0*phi);
-  bt3 = -3.0 * d_mbt_f3[type] * sin(3.0*phi);
+  bt2 = -2.0 * d_mbt_f2[type] * Kokkos::Experimental::sin(2.0*phi);
+  bt3 = -3.0 * d_mbt_f3[type] * Kokkos::Experimental::sin(3.0*phi);
   F_FLOAT sumbtf = bt1 + bt2 + bt3;
 
   for (int i = 0; i < 4; i++)
@@ -484,8 +484,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // force on bond1
 
   bt1 = d_ebt_f1_1[type] * sinphi;
-  bt2 = 2.0 * d_ebt_f2_1[type] * sin(2.0*phi);
-  bt3 = 3.0 * d_ebt_f3_1[type] * sin(3.0*phi);
+  bt2 = 2.0 * d_ebt_f2_1[type] * Kokkos::Experimental::sin(2.0*phi);
+  bt3 = 3.0 * d_ebt_f3_1[type] * Kokkos::Experimental::sin(3.0*phi);
   sumbtf = bt1 + bt2 + bt3;
 
   for (int i = 0; i < 4; i++)
@@ -506,8 +506,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // force on bond3
 
   bt1 = -d_ebt_f1_2[type] * sinphi;
-  bt2 = -2.0 * d_ebt_f2_2[type] * sin(2.0*phi);
-  bt3 = -3.0 * d_ebt_f3_2[type] * sin(3.0*phi);
+  bt2 = -2.0 * d_ebt_f2_2[type] * Kokkos::Experimental::sin(2.0*phi);
+  bt3 = -3.0 * d_ebt_f3_2[type] * Kokkos::Experimental::sin(3.0*phi);
   sumbtf = bt1 + bt2 + bt3;
 
   for (int i = 0; i < 4; i++)
@@ -528,8 +528,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // force on angle1
 
   bt1 = d_at_f1_1[type] * sinphi;
-  bt2 = 2.0 * d_at_f2_1[type] * sin(2.0*phi);
-  bt3 = 3.0 * d_at_f3_1[type] * sin(3.0*phi);
+  bt2 = 2.0 * d_at_f2_1[type] * Kokkos::Experimental::sin(2.0*phi);
+  bt3 = 3.0 * d_at_f3_1[type] * Kokkos::Experimental::sin(3.0*phi);
   sumbtf = bt1 + bt2 + bt3;
 
   for (int i = 0; i < 4; i++)
@@ -549,8 +549,8 @@ void DihedralClass2Kokkos<DeviceType>::operator()(TagDihedralClass2Compute<NEWTO
   // force on angle2
 
   bt1 = -d_at_f1_2[type] * sinphi;
-  bt2 = -2.0 * d_at_f2_2[type] * sin(2.0*phi);
-  bt3 = -3.0 * d_at_f3_2[type] * sin(3.0*phi);
+  bt2 = -2.0 * d_at_f2_2[type] * Kokkos::Experimental::sin(2.0*phi);
+  bt3 = -3.0 * d_at_f3_2[type] * Kokkos::Experimental::sin(3.0*phi);
   sumbtf = bt1 + bt2 + bt3;
 
   for (int i = 0; i < 4; i++)

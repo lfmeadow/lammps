@@ -149,7 +149,7 @@ void BondClass2Kokkos<DeviceType>::operator()(TagBondClass2Compute<NEWTON_BOND,E
   const F_FLOAT delz = x(i1,2) - x(i2,2);
 
   const F_FLOAT rsq = delx*delx + dely*dely + delz*delz;
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT dr = r - d_r0[type];
   const F_FLOAT dr2 = dr*dr;
   const F_FLOAT dr3 = dr2*dr;

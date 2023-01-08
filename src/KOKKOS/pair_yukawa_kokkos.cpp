@@ -219,18 +219,18 @@ compute_fpair(const F_FLOAT& rsq, const int& i, const int&j,
               const int& itype, const int& jtype) const {
   (void) i;
   (void) j;
-  const F_FLOAT rr     = sqrt(rsq);
+  const F_FLOAT rr     = Kokkos::Experimental::sqrt(rsq);
   // Fetch the params either off the stack or from some mapped memory?
   const F_FLOAT aa     = STACKPARAMS ? m_params[itype][jtype].a
                                      : params(itype,jtype).a;
 
-  // U   = a * exp(-kappa*r) / r
-  // f   = (kappa * a * exp(-kappa*r) / r + a*exp(-kappa*r)/r^2)*grad(r)
-  //     = (kappa + 1/r) * (a * exp(-kappa*r) / r)
-  // f/r = (kappa + 1/r) * (a * exp(-kappa*r) / r^2)
+  // U   = a * Kokkos::Experimental::exp(-kappa*r) / r
+  // f   = (kappa * a * Kokkos::Experimental::exp(-kappa*r) / r + a*exp(-kappa*r)/r^2)*grad(r)
+  //     = (kappa + 1/r) * (a * Kokkos::Experimental::exp(-kappa*r) / r)
+  // f/r = (kappa + 1/r) * (a * Kokkos::Experimental::exp(-kappa*r) / r^2)
   const F_FLOAT rinv = 1.0 / rr;
   const F_FLOAT rinv2 = rinv*rinv;
-  const F_FLOAT screening = exp(-kappa*rr);
+  const F_FLOAT screening = Kokkos::Experimental::exp(-kappa*rr);
   const F_FLOAT forceyukawa = aa * screening * (kappa + rinv);
   const F_FLOAT fpair = forceyukawa * rinv2;
 
@@ -245,18 +245,18 @@ compute_evdwl(const F_FLOAT& rsq, const int& i, const int&j,
               const int& itype, const int& jtype) const {
   (void) i;
   (void) j;
-  const F_FLOAT rr     = sqrt(rsq);
+  const F_FLOAT rr     = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT aa     = STACKPARAMS ? m_params[itype][jtype].a
                                      : params(itype,jtype).a;
   const F_FLOAT offset = STACKPARAMS ? m_params[itype][jtype].offset
                                      : params(itype,jtype).offset;
 
-  // U   = a * exp(-kappa*r) / r
-  // f   = (kappa * a * exp(-kappa*r) / r + a*exp(-kappa*r)/r^2)*grad(r)
-  //     = (kappa + 1/r) * (a * exp(-kappa*r) / r)
-  // f/r = (kappa + 1/r) * (a * exp(-kappa*r) / r^2)
+  // U   = a * Kokkos::Experimental::exp(-kappa*r) / r
+  // f   = (kappa * a * Kokkos::Experimental::exp(-kappa*r) / r + a*exp(-kappa*r)/r^2)*grad(r)
+  //     = (kappa + 1/r) * (a * Kokkos::Experimental::exp(-kappa*r) / r)
+  // f/r = (kappa + 1/r) * (a * Kokkos::Experimental::exp(-kappa*r) / r^2)
   const F_FLOAT rinv = 1.0 / rr;
-  const F_FLOAT screening = exp(-kappa*rr);
+  const F_FLOAT screening = Kokkos::Experimental::exp(-kappa*rr);
 
   return aa * screening * rinv - offset;
 }

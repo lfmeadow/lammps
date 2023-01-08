@@ -143,7 +143,7 @@ compute_fpair(const F_FLOAT& rsq, const int& i, const int&j, const int& itype, c
   (void) i;
   (void) j;
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r3inv = r2inv*rinv;
   const F_FLOAT r6inv = r3inv*r3inv;
 
@@ -163,7 +163,7 @@ compute_evdwl(const F_FLOAT& rsq, const int& i, const int&j, const int& itype, c
   (void) i;
   (void) j;
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r3inv = r2inv*rinv;
   const F_FLOAT r6inv = r3inv*r3inv;
 

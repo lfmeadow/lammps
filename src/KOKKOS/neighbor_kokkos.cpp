@@ -173,11 +173,11 @@ int NeighborKokkos::check_distance_kokkos()
       delx = bboxlo[0] - boxlo_hold[0];
       dely = bboxlo[1] - boxlo_hold[1];
       delz = bboxlo[2] - boxlo_hold[2];
-      delta1 = sqrt(delx*delx + dely*dely + delz*delz);
+      delta1 = Kokkos::Experimental::sqrt(delx*delx + dely*dely + delz*delz);
       delx = bboxhi[0] - boxhi_hold[0];
       dely = bboxhi[1] - boxhi_hold[1];
       delz = bboxhi[2] - boxhi_hold[2];
-      delta2 = sqrt(delx*delx + dely*dely + delz*delz);
+      delta2 = Kokkos::Experimental::sqrt(delx*delx + dely*dely + delz*delz);
       delta = 0.5 * (skin - (delta1+delta2));
       deltasq = delta*delta;
     } else {
@@ -187,7 +187,7 @@ int NeighborKokkos::check_distance_kokkos()
         delx = corners[i][0] - corners_hold[i][0];
         dely = corners[i][1] - corners_hold[i][1];
         delz = corners[i][2] - corners_hold[i][2];
-        delta = sqrt(delx*delx + dely*dely + delz*delz);
+        delta = Kokkos::Experimental::sqrt(delx*delx + dely*dely + delz*delz);
         if (delta > delta1) delta1 = delta;
         else if (delta > delta2) delta2 = delta;
       }

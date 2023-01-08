@@ -226,8 +226,8 @@ void MinKokkos::setup(int flag)
   if (output->thermo->normflag) ecurrent /= atom->natoms;
 
   einitial = ecurrent;
-  fnorm2_init = sqrt(fnorm_sqr());
-  fnorminf_init = sqrt(fnorm_inf());
+  fnorm2_init = Kokkos::Experimental::sqrt(fnorm_sqr());
+  fnorminf_init = Kokkos::Experimental::sqrt(fnorm_inf());
 }
 
 /* ----------------------------------------------------------------------
@@ -334,8 +334,8 @@ void MinKokkos::setup_minimal(int flag)
   if (output->thermo->normflag) ecurrent /= atom->natoms;
 
   einitial = ecurrent;
-  fnorm2_init = sqrt(fnorm_sqr());
-  fnorminf_init = sqrt(fnorm_inf());
+  fnorm2_init = Kokkos::Experimental::sqrt(fnorm_sqr());
+  fnorminf_init = Kokkos::Experimental::sqrt(fnorm_inf());
 }
 
 /* ----------------------------------------------------------------------

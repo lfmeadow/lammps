@@ -220,9 +220,9 @@ compute_fcoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT prefactor = factor_coul * qqrd2e * qtmp * q(j);
-  const F_FLOAT erfcd = exp(-alpha*alpha*rsq);
+  const F_FLOAT erfcd = Kokkos::Experimental::exp(-alpha*alpha*rsq);
   const F_FLOAT t = 1.0 / (1.0 + EWALD_P*alpha*r);
   const F_FLOAT erfcc = t * (A1+t*(A2+t*(A3+t*(A4+t*A5)))) * erfcd;
 
@@ -241,9 +241,9 @@ compute_ecoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const int& /*itype*/, const int& /*jtype*/,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
-  const F_FLOAT r = sqrt(rsq);
+  const F_FLOAT r = Kokkos::Experimental::sqrt(rsq);
   const F_FLOAT prefactor = factor_coul * qqrd2e * qtmp * q(j);
-  const F_FLOAT erfcd = exp(-alpha*alpha*rsq);
+  const F_FLOAT erfcd = Kokkos::Experimental::exp(-alpha*alpha*rsq);
   const F_FLOAT t = 1.0 / (1.0 + EWALD_P*alpha*r);
   const F_FLOAT erfcc = t * (A1+t*(A2+t*(A3+t*(A4+t*A5)))) * erfcd;
 

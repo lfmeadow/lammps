@@ -451,13 +451,13 @@ void PairSWKokkos<DeviceType>::twobody(const Param& param, const F_FLOAT& rsq, F
 {
   F_FLOAT r,rinvsq,rp,rq,rainv,rainvsq,expsrainv;
 
-  r = sqrt(rsq);
+  r = Kokkos::Experimental::sqrt(rsq);
   rinvsq = 1.0/rsq;
-  rp = pow(r,-param.powerp);
-  rq = pow(r,-param.powerq);
+  rp = Kokkos::Experimental::pow(r,-param.powerp);
+  rq = Kokkos::Experimental::pow(r,-param.powerq);
   rainv = 1.0 / (r - param.cut);
   rainvsq = rainv*rainv*r;
-  expsrainv = exp(param.sigma * rainv);
+  expsrainv = Kokkos::Experimental::exp(param.sigma * rainv);
   fforce = (param.c1*rp - param.c2*rq +
             (param.c3*rp -param.c4*rq) * rainvsq) * expsrainv * rinvsq;
   if (eflag) eng = (param.c5*rp - param.c6*rq) * expsrainv;
@@ -477,19 +477,19 @@ void PairSWKokkos<DeviceType>::threebody_kk(const Param& paramij, const Param& p
   F_FLOAT rinv12,cs,delcs,delcssq,facexp,facrad,frad1,frad2;
   F_FLOAT facang,facang12,csfacang,csfac1,csfac2;
 
-  r1 = sqrt(rsq1);
+  r1 = Kokkos::Experimental::sqrt(rsq1);
   rinvsq1 = 1.0/rsq1;
   rainv1 = 1.0/(r1 - paramij.cut);
   gsrainv1 = paramij.sigma_gamma * rainv1;
   gsrainvsq1 = gsrainv1*rainv1/r1;
-  expgsrainv1 = exp(gsrainv1);
+  expgsrainv1 = Kokkos::Experimental::exp(gsrainv1);
 
-  r2 = sqrt(rsq2);
+  r2 = Kokkos::Experimental::sqrt(rsq2);
   rinvsq2 = 1.0/rsq2;
   rainv2 = 1.0/(r2 - paramik.cut);
   gsrainv2 = paramik.sigma_gamma * rainv2;
   gsrainvsq2 = gsrainv2*rainv2/r2;
-  expgsrainv2 = exp(gsrainv2);
+  expgsrainv2 = Kokkos::Experimental::exp(gsrainv2);
 
   rinv12 = 1.0/(r1*r2);
   cs = (delr1[0]*delr2[0] + delr1[1]*delr2[1] + delr1[2]*delr2[2]) * rinv12;
@@ -498,7 +498,7 @@ void PairSWKokkos<DeviceType>::threebody_kk(const Param& paramij, const Param& p
 
   facexp = expgsrainv1*expgsrainv2;
 
-  // facrad = sqrt(paramij.lambda_epsilon*paramik.lambda_epsilon) *
+  // facrad = Kokkos::Experimental::sqrt(paramij.lambda_epsilon*paramik.lambda_epsilon) *
   //          facexp*delcssq;
 
   facrad = paramijk.lambda_epsilon * facexp*delcssq;

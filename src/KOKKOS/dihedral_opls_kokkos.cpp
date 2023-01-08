@@ -195,19 +195,19 @@ void DihedralOPLSKokkos<DeviceType>::operator()(TagDihedralOPLSCompute<NEWTON_BO
   const F_FLOAT sb2 = 1.0 / (vb2x*vb2x + vb2y*vb2y + vb2z*vb2z);
   const F_FLOAT sb3 = 1.0 / (vb3x*vb3x + vb3y*vb3y + vb3z*vb3z);
 
-  const F_FLOAT rb1 = sqrt(sb1);
-  const F_FLOAT rb3 = sqrt(sb3);
+  const F_FLOAT rb1 = Kokkos::Experimental::sqrt(sb1);
+  const F_FLOAT rb3 = Kokkos::Experimental::sqrt(sb3);
 
   const F_FLOAT c0 = (vb1x*vb3x + vb1y*vb3y + vb1z*vb3z) * rb1*rb3;
 
   // 1st and 2nd angle
 
   const F_FLOAT b1mag2 = vb1x*vb1x + vb1y*vb1y + vb1z*vb1z;
-  const F_FLOAT b1mag = sqrt(b1mag2);
+  const F_FLOAT b1mag = Kokkos::Experimental::sqrt(b1mag2);
   const F_FLOAT b2mag2 = vb2x*vb2x + vb2y*vb2y + vb2z*vb2z;
-  const F_FLOAT b2mag = sqrt(b2mag2);
+  const F_FLOAT b2mag = Kokkos::Experimental::sqrt(b2mag2);
   const F_FLOAT b3mag2 = vb3x*vb3x + vb3y*vb3y + vb3z*vb3z;
-  const F_FLOAT b3mag = sqrt(b3mag2);
+  const F_FLOAT b3mag = Kokkos::Experimental::sqrt(b3mag2);
 
   F_FLOAT ctmp = vb1x*vb2x + vb1y*vb2y + vb1z*vb2z;
   const F_FLOAT r12c1 = 1.0 / (b1mag*b2mag);
@@ -217,15 +217,15 @@ void DihedralOPLSKokkos<DeviceType>::operator()(TagDihedralOPLSCompute<NEWTON_BO
   const F_FLOAT r12c2 = 1.0 / (b2mag*b3mag);
   const F_FLOAT c2mag = ctmp * r12c2;
 
-  // cos and sin of 2 angles and final c
+  // Kokkos::Experimental::cos and Kokkos::Experimental::sin of 2 angles and final c
 
   F_FLOAT sin2 = MAX(1.0 - c1mag*c1mag,0.0);
-  F_FLOAT sc1 = sqrt(sin2);
+  F_FLOAT sc1 = Kokkos::Experimental::sqrt(sin2);
   if (sc1 < SMALL) sc1 = SMALL;
   sc1 = 1.0/sc1;
 
   sin2 = MAX(1.0 - c2mag*c2mag,0.0);
-  F_FLOAT sc2 = sqrt(sin2);
+  F_FLOAT sc2 = Kokkos::Experimental::sqrt(sin2);
   if (sc2 < SMALL) sc2 = SMALL;
   sc2 = 1.0/sc2;
 
@@ -237,7 +237,7 @@ void DihedralOPLSKokkos<DeviceType>::operator()(TagDihedralOPLSCompute<NEWTON_BO
   const F_FLOAT cx = vb1y*vb2z - vb1z*vb2y;
   const F_FLOAT cy = vb1z*vb2x - vb1x*vb2z;
   const F_FLOAT cz = vb1x*vb2y - vb1y*vb2x;
-  const F_FLOAT cmag = sqrt(cx*cx + cy*cy + cz*cz);
+  const F_FLOAT cmag = Kokkos::Experimental::sqrt(cx*cx + cy*cy + cz*cz);
   const F_FLOAT dx = (cx*vb3x + cy*vb3y + cz*vb3z)/cmag/b3mag;
 
   // error check
@@ -249,19 +249,19 @@ void DihedralOPLSKokkos<DeviceType>::operator()(TagDihedralOPLSCompute<NEWTON_BO
   if (c < -1.0) c = -1.0;
 
   // force & energy
-  // p = sum (i=1,4) k_i * (1 + (-1)**(i+1)*cos(i*phi) )
+  // p = sum (i=1,4) k_i * (1 + (-1)**(i+1)*Kokkos::Experimental::cos(i*phi) )
   // pd = dp/dc
 
   F_FLOAT phi = acos(c);
   if (dx < 0.0) phi *= -1.0;
-  F_FLOAT si = sin(phi);
+  F_FLOAT si = Kokkos::Experimental::sin(phi);
   if (fabs(si) < SMALLER) si = SMALLER;
   const F_FLOAT siinv = 1.0/si;
 
-  const F_FLOAT p = d_k1[type]*(1.0 + c) + d_k2[type]*(1.0 - cos(2.0*phi)) +
-    d_k3[type]*(1.0 + cos(3.0*phi)) + d_k4[type]*(1.0 - cos(4.0*phi)) ;
-  const F_FLOAT pd = d_k1[type] - 2.0*d_k2[type]*sin(2.0*phi)*siinv +
-    3.0*d_k3[type]*sin(3.0*phi)*siinv - 4.0*d_k4[type]*sin(4.0*phi)*siinv;
+  const F_FLOAT p = d_k1[type]*(1.0 + c) + d_k2[type]*(1.0 - Kokkos::Experimental::cos(2.0*phi)) +
+    d_k3[type]*(1.0 + Kokkos::Experimental::cos(3.0*phi)) + d_k4[type]*(1.0 - cos(4.0*phi)) ;
+  const F_FLOAT pd = d_k1[type] - 2.0*d_k2[type]*Kokkos::Experimental::sin(2.0*phi)*siinv +
+    3.0*d_k3[type]*Kokkos::Experimental::sin(3.0*phi)*siinv - 4.0*d_k4[type]*sin(4.0*phi)*siinv;
 
   E_FLOAT edihedral = 0.0;
   if (eflag) edihedral = p;

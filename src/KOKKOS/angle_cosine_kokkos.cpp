@@ -157,7 +157,7 @@ void AngleCosineKokkos<DeviceType>::operator()(TagAngleCosineCompute<NEWTON_BOND
   const F_FLOAT delz1 = x(i1,2) - x(i2,2);
 
   const F_FLOAT rsq1 = delx1*delx1 + dely1*dely1 + delz1*delz1;
-  const F_FLOAT r1 = sqrt(rsq1);
+  const F_FLOAT r1 = Kokkos::Experimental::sqrt(rsq1);
 
   // 2nd bond
 
@@ -166,7 +166,7 @@ void AngleCosineKokkos<DeviceType>::operator()(TagAngleCosineCompute<NEWTON_BOND
   const F_FLOAT delz2 = x(i3,2) - x(i2,2);
 
   const F_FLOAT rsq2 = delx2*delx2 + dely2*dely2 + delz2*delz2;
-  const F_FLOAT r2 = sqrt(rsq2);
+  const F_FLOAT r2 = Kokkos::Experimental::sqrt(rsq2);
 
   // c = cosine of angle
 

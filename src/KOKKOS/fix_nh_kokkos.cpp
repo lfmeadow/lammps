@@ -339,28 +339,28 @@ void FixNHKokkos<DeviceType>::remap()
   if (pstyle == TRICLINIC) {
 
     if (p_flag[4]) {
-      expfac = exp(dto8*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto8*omega_dot[0]);
       h[4] *= expfac;
       h[4] += dto4*(omega_dot[5]*h[3]+omega_dot[4]*h[2]);
       h[4] *= expfac;
     }
 
     if (p_flag[3]) {
-      expfac = exp(dto4*omega_dot[1]);
+      expfac = Kokkos::Experimental::exp(dto4*omega_dot[1]);
       h[3] *= expfac;
       h[3] += dto2*(omega_dot[3]*h[2]);
       h[3] *= expfac;
     }
 
     if (p_flag[5]) {
-      expfac = exp(dto4*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto4*omega_dot[0]);
       h[5] *= expfac;
       h[5] += dto2*(omega_dot[5]*h[1]);
       h[5] *= expfac;
     }
 
     if (p_flag[4]) {
-      expfac = exp(dto8*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto8*omega_dot[0]);
       h[4] *= expfac;
       h[4] += dto4*(omega_dot[5]*h[3]+omega_dot[4]*h[2]);
       h[4] *= expfac;
@@ -373,7 +373,7 @@ void FixNHKokkos<DeviceType>::remap()
   if (p_flag[0]) {
     oldlo = domain->boxlo[0];
     oldhi = domain->boxhi[0];
-    expfac = exp(dto*omega_dot[0]);
+    expfac = Kokkos::Experimental::exp(dto*omega_dot[0]);
     domain->boxlo[0] = (oldlo-fixedpoint[0])*expfac + fixedpoint[0];
     domain->boxhi[0] = (oldhi-fixedpoint[0])*expfac + fixedpoint[0];
   }
@@ -381,7 +381,7 @@ void FixNHKokkos<DeviceType>::remap()
   if (p_flag[1]) {
     oldlo = domain->boxlo[1];
     oldhi = domain->boxhi[1];
-    expfac = exp(dto*omega_dot[1]);
+    expfac = Kokkos::Experimental::exp(dto*omega_dot[1]);
     domain->boxlo[1] = (oldlo-fixedpoint[1])*expfac + fixedpoint[1];
     domain->boxhi[1] = (oldhi-fixedpoint[1])*expfac + fixedpoint[1];
     if (scalexy) h[5] *= expfac;
@@ -390,7 +390,7 @@ void FixNHKokkos<DeviceType>::remap()
   if (p_flag[2]) {
     oldlo = domain->boxlo[2];
     oldhi = domain->boxhi[2];
-    expfac = exp(dto*omega_dot[2]);
+    expfac = Kokkos::Experimental::exp(dto*omega_dot[2]);
     domain->boxlo[2] = (oldlo-fixedpoint[2])*expfac + fixedpoint[2];
     domain->boxhi[2] = (oldhi-fixedpoint[2])*expfac + fixedpoint[2];
     if (scalexz) h[4] *= expfac;
@@ -402,28 +402,28 @@ void FixNHKokkos<DeviceType>::remap()
   if (pstyle == TRICLINIC) {
 
     if (p_flag[4]) {
-      expfac = exp(dto8*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto8*omega_dot[0]);
       h[4] *= expfac;
       h[4] += dto4*(omega_dot[5]*h[3]+omega_dot[4]*h[2]);
       h[4] *= expfac;
     }
 
     if (p_flag[3]) {
-      expfac = exp(dto4*omega_dot[1]);
+      expfac = Kokkos::Experimental::exp(dto4*omega_dot[1]);
       h[3] *= expfac;
       h[3] += dto2*(omega_dot[3]*h[2]);
       h[3] *= expfac;
     }
 
     if (p_flag[5]) {
-      expfac = exp(dto4*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto4*omega_dot[0]);
       h[5] *= expfac;
       h[5] += dto2*(omega_dot[5]*h[1]);
       h[5] *= expfac;
     }
 
     if (p_flag[4]) {
-      expfac = exp(dto8*omega_dot[0]);
+      expfac = Kokkos::Experimental::exp(dto8*omega_dot[0]);
       h[4] *= expfac;
       h[4] += dto4*(omega_dot[5]*h[3]+omega_dot[4]*h[2]);
       h[4] *= expfac;
@@ -476,9 +476,9 @@ void FixNHKokkos<DeviceType>::nh_v_press()
   int nlocal = atomKK->nlocal;
   if (igroup == atomKK->firstgroup) nlocal = atomKK->nfirst;
 
-  factor[0] = exp(-dt4*(omega_dot[0]+mtk_term2));
-  factor[1] = exp(-dt4*(omega_dot[1]+mtk_term2));
-  factor[2] = exp(-dt4*(omega_dot[2]+mtk_term2));
+  factor[0] = Kokkos::Experimental::exp(-dt4*(omega_dot[0]+mtk_term2));
+  factor[1] = Kokkos::Experimental::exp(-dt4*(omega_dot[1]+mtk_term2));
+  factor[2] = Kokkos::Experimental::exp(-dt4*(omega_dot[2]+mtk_term2));
 
   if (which == BIAS) {
     atomKK->sync(temperature->execution_space,temperature->datamask_read);

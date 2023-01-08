@@ -112,19 +112,19 @@ void FixDeformKokkos::end_of_step()
     } else if (set[i].style == TRATE) {
       double delt = (update->ntimestep - update->beginstep) * update->dt;
       set[i].lo_target = 0.5*(set[i].lo_start+set[i].hi_start) -
-        0.5*((set[i].hi_start-set[i].lo_start) * exp(set[i].rate*delt));
+        0.5*((set[i].hi_start-set[i].lo_start) * Kokkos::Experimental::exp(set[i].rate*delt));
       set[i].hi_target = 0.5*(set[i].lo_start+set[i].hi_start) +
-        0.5*((set[i].hi_start-set[i].lo_start) * exp(set[i].rate*delt));
+        0.5*((set[i].hi_start-set[i].lo_start) * Kokkos::Experimental::exp(set[i].rate*delt));
       h_rate[i] = set[i].rate * domain->h[i];
       h_ratelo[i] = -0.5*h_rate[i];
     } else if (set[i].style == WIGGLE) {
       double delt = (update->ntimestep - update->beginstep) * update->dt;
       set[i].lo_target = set[i].lo_start -
-        0.5*set[i].amplitude * sin(TWOPI*delt/set[i].tperiod);
+        0.5*set[i].amplitude * Kokkos::Experimental::sin(TWOPI*delt/set[i].tperiod);
       set[i].hi_target = set[i].hi_start +
-        0.5*set[i].amplitude * sin(TWOPI*delt/set[i].tperiod);
+        0.5*set[i].amplitude * Kokkos::Experimental::sin(TWOPI*delt/set[i].tperiod);
       h_rate[i] = TWOPI/set[i].tperiod * set[i].amplitude *
-        cos(TWOPI*delt/set[i].tperiod);
+        Kokkos::Experimental::cos(TWOPI*delt/set[i].tperiod);
       h_ratelo[i] = -0.5*h_rate[i];
     } else if (set[i].style == VARIABLE) {
       double del = input->variable->compute_equal(set[i].hvar);
@@ -174,14 +174,14 @@ void FixDeformKokkos::end_of_step()
 
     } else if (set[i].substyle == TWO_FROM_ONE) {
       set[i].lo_target = 0.5*(set[i].lo_start+set[i].hi_start) -
-        0.5*sqrt(set[i].vol_start /
+        0.5*Kokkos::Experimental::sqrt(set[i].vol_start /
                  (set[set[i].dynamic1].hi_target -
                   set[set[i].dynamic1].lo_target) /
                  (set[set[i].fixed].hi_start -
                   set[set[i].fixed].lo_start) *
                  (set[i].hi_start - set[i].lo_start));
       set[i].hi_target = 0.5*(set[i].lo_start+set[i].hi_start) +
-        0.5*sqrt(set[i].vol_start /
+        0.5*Kokkos::Experimental::sqrt(set[i].vol_start /
                  (set[set[i].dynamic1].hi_target -
                   set[set[i].dynamic1].lo_target) /
                  (set[set[i].fixed].hi_start -
@@ -207,14 +207,14 @@ void FixDeformKokkos::end_of_step()
         else if (i == 3) set[i].tilt_target = domain->yz;
       } else if (set[i].style == TRATE) {
         double delt = (update->ntimestep - update->beginstep) * update->dt;
-        set[i].tilt_target = set[i].tilt_start * exp(set[i].rate*delt);
+        set[i].tilt_target = set[i].tilt_start * Kokkos::Experimental::exp(set[i].rate*delt);
         h_rate[i] = set[i].rate * domain->h[i];
       } else if (set[i].style == WIGGLE) {
         double delt = (update->ntimestep - update->beginstep) * update->dt;
         set[i].tilt_target = set[i].tilt_start +
-          set[i].amplitude * sin(TWOPI*delt/set[i].tperiod);
+          set[i].amplitude * Kokkos::Experimental::sin(TWOPI*delt/set[i].tperiod);
         h_rate[i] = TWOPI/set[i].tperiod * set[i].amplitude *
-          cos(TWOPI*delt/set[i].tperiod);
+          Kokkos::Experimental::cos(TWOPI*delt/set[i].tperiod);
       } else if (set[i].style == VARIABLE) {
         double delta_tilt = input->variable->compute_equal(set[i].hvar);
         set[i].tilt_target = set[i].tilt_start + delta_tilt;

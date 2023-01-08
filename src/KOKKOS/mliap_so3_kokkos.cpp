@@ -152,7 +152,7 @@ void MLIAP_SO3Kokkos<DeviceType>::init()
     int i=0;
     for (int l = 0; l < lmax + 2; l++)
       for (int m = -l; m < l + 1; m++) {
-        pfac[l * pfac_l2 + m] = sqrt((2.0 * l + 1.0) * pfac1) * powsign(m);
+        pfac[l * pfac_l2 + m] = Kokkos::Experimental::sqrt((2.0 * l + 1.0) * pfac1) * powsign(m);
         Ylms[i] = pfac[l * pfac_l2 + m];
         i += 1;
       }
@@ -182,17 +182,17 @@ void MLIAP_SO3Kokkos<DeviceType>::init()
     int l = ll+1;
     for (int m = -l; m < l + 1; m++) {
       dfac0[l * dfac_l2 + m] =
-          -sqrt(((l + 1.0) * (l + 1.0) - m * m) / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
+          -Kokkos::Experimental::sqrt(((l + 1.0) * (l + 1.0) - m * m) / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
       dfac1[l * dfac_l2 + m] =
-          sqrt((l * l - m * m) / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
+          Kokkos::Experimental::sqrt((l * l - m * m) / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
       dfac2[l * dfac_l2 + m] =
-          -sqrt((l + m + 1.0) * (l + m + 2.0) / 2.0 / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
+          -Kokkos::Experimental::sqrt((l + m + 1.0) * (l + m + 2.0) / 2.0 / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
       dfac3[l * dfac_l2 + m] =
-          sqrt((l - m - 1.0) * (l - m) / 2.0 / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
+          Kokkos::Experimental::sqrt((l - m - 1.0) * (l - m) / 2.0 / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
       dfac4[l * dfac_l2 + m] =
-          -sqrt((l - m + 1.0) * (l - m + 2.0) / 2.0 / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
+          -Kokkos::Experimental::sqrt((l - m + 1.0) * (l - m + 2.0) / 2.0 / (2.0 * l + 1.0) / (2.0 * l + 3.0)) * l;
       dfac5[l * dfac_l2 + m] =
-          sqrt((l + m - 1.0) * (l + m) / 2.0 / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
+          Kokkos::Experimental::sqrt((l + m - 1.0) * (l + m) / 2.0 / (2.0 * l - 1.0) / (2.0 * l + 1.0)) * (l + 1.0);
     }
   });
 
@@ -226,7 +226,7 @@ void MLIAP_SO3Kokkos<DeviceType>::init()
   auto ldim=m_ldim;
   Kokkos::parallel_for(range(1,m_ldim), KOKKOS_LAMBDA (int p) {
     for (int q = 1; q < ldim; q++)
-      rootpq[p * ldim + q] = sqrt(static_cast<double>(p) / q);
+      rootpq[p * ldim + q] = Kokkos::Experimental::sqrt(static_cast<double>(p) / q);
   });
 
   memoryKK->destroy_kokkos(m_idxu_block);
@@ -332,7 +332,7 @@ void MLIAP_SO3Kokkos<DeviceType>::compute_W(int nmax, double *arr)
     for (beta = 1; beta < alpha + 1; beta++) {
       temp2 = (2 * beta + 5) * (2 * beta + 6) * (2 * beta + 7);
       arr[(alpha - 1) * nmax + beta - 1] =
-          sqrt(temp1 * temp2) / (5 + alpha + beta) / (6 + alpha + beta) / (7 + alpha + beta);
+          Kokkos::Experimental::sqrt(temp1 * temp2) / (5 + alpha + beta) / (6 + alpha + beta) / (7 + alpha + beta);
       arr[(beta - 1) * nmax + alpha - 1] = arr[(alpha - 1) * nmax + beta - 1];
     }
   }
@@ -368,7 +368,7 @@ void MLIAP_SO3Kokkos<DeviceType>::compute_W(int nmax, double *arr)
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       if (i == j)
-        sqrtD[i * n + j] = sqrt(tempout[i]);
+        sqrtD[i * n + j] = Kokkos::Experimental::sqrt(tempout[i]);
       else
         sqrtD[i * n + j] = 0.0;
 
@@ -421,7 +421,7 @@ void MLIAP_SO3Kokkos<DeviceType>::compute_pi(int nmax, int lmax, ViewType clistt
     for (n2 = 0; n2 < n1 + 1; n2++) {
       j = 0;
       for (l = 0; l < lmax + 1; l++) {
-        norm = 2.0 * sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
+        norm = 2.0 * Kokkos::Experimental::sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
 
         for (m = -l; m < l + 1; m++) {
 
@@ -441,7 +441,7 @@ template <class DeviceType>
 double MLIAP_SO3Kokkos<DeviceType>::phi(double r, int alpha, double rcut)
 {
   return powint((rcut - r), (alpha + 2)) /
-      sqrt(2 * powint(rcut, (2 * alpha + 7)) / (2 * alpha + 5) / (2 * alpha + 6) / (2 * alpha + 7));
+      Kokkos::Experimental::sqrt(2 * powint(rcut, (2 * alpha + 7)) / (2 * alpha + 5) / (2 * alpha + 6) / (2 * alpha + 7));
 }
 
 /* ---------------------------------------------------------------------- */
@@ -465,7 +465,7 @@ KOKKOS_INLINE_FUNCTION
 double MLIAP_SO3Kokkos<DeviceType>::Cosine(double Rij, double Rc) const
 {
 
-  return 0.5 * (cos(MY_PI * Rij / Rc) + 1.0);
+  return 0.5 * (Kokkos::Experimental::cos(MY_PI * Rij / Rc) + 1.0);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -474,7 +474,7 @@ KOKKOS_INLINE_FUNCTION
 double MLIAP_SO3Kokkos<DeviceType>::CosinePrime(double Rij, double Rc) const
 {
 
-  return -0.5 * MY_PI / Rc * sin(MY_PI * Rij / Rc);
+  return -0.5 * MY_PI / Rc * Kokkos::Experimental::sin(MY_PI * Rij / Rc);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -533,11 +533,11 @@ void MLIAP_SO3Kokkos<DeviceType>::compute_uarray_recursive(double x, double y, d
   theta = acos(z / r);
   phi = atan2(y, x);
 
-  atheta = cos(theta / 2);
-  btheta = sin(theta / 2);
+  atheta = Kokkos::Experimental::cos(theta / 2);
+  btheta = Kokkos::Experimental::sin(theta / 2);
 
-  aphi_r = cos(phi / 2);
-  aphi_i = sin(phi / 2);
+  aphi_r = Kokkos::Experimental::cos(phi / 2);
+  aphi_i = Kokkos::Experimental::sin(phi / 2);
 
   a_r = atheta * aphi_r;
   a_i = atheta * aphi_i;
@@ -616,13 +616,13 @@ void MLIAP_SO3Kokkos<DeviceType>::init_garray(int nmax, int lmax, double rcut, d
 
   for (i = 1; i < Nmax + 1; i++) {
     // roots of Chebyshev polynomial of degree N
-    x = cos((2 * i - 1) * MY_PI / 2 / Nmax);
+    x = Kokkos::Experimental::cos((2 * i - 1) * MY_PI / 2 / Nmax);
     // transform the interval [-1,1] to [0, rcut]
     xi = rcut / 2 * (x + 1);
     for (n = 1; n < nmax + 1; n++)
       // r**2*g(n)(r)*e^(-alpha*r**2)
-      g_array[(n - 1) * lg2 + i - 1] = rcut / 2 * MY_PI / Nmax * sqrt(1 - x * x) * xi * xi *
-          compute_g(xi, n, nmax, rcut, w, lw1) * exp(-alpha * xi * xi);
+      g_array[(n - 1) * lg2 + i - 1] = rcut / 2 * MY_PI / Nmax * Kokkos::Experimental::sqrt(1 - x * x) * xi * xi *
+          compute_g(xi, n, nmax, rcut, w, lw1) * Kokkos::Experimental::exp(-alpha * xi * xi);
   }
 }
 
@@ -638,7 +638,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAPSO3GetSBESArrayTag&, in
      double z = t_rij(ipair, 2);
      ipair++;
 
-     double ri = sqrt(x * x + y * y + z * z);
+     double ri = Kokkos::Experimental::sqrt(x * x + y * y + z * z);
 
      if (ri < SMALL) continue;
 
@@ -653,7 +653,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAPSO3GetSBESArrayTag&, in
      for (int i = 1; i < m_Nmax + 1; i++) {
        const bigint i1mindex = (bigint) (i - 1) * mindex;
 
-       x = cos((2 * i - 1) * pfac3);
+       x = Kokkos::Experimental::cos((2 * i - 1) * pfac3);
        double xi = pfac4 * (x + 1);
        double rb = pfac2 * (x + 1);
 
@@ -699,10 +699,10 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAPSO3GetRipArrayTag&, int
      double z = t_rij(ipair, 2);
      ipair++;
 
-     double ri = sqrt(x * x + y * y + z * z);
+     double ri = Kokkos::Experimental::sqrt(x * x + y * y + z * z);
      if (ri < SMALL) continue;
 
-     double expfac = 4 * MY_PI * exp(-t_alpha * ri * ri);
+     double expfac = 4 * MY_PI * Kokkos::Experimental::exp(-t_alpha * ri * ri);
      for (int n = 1; n < t_nmax + 1; n++)
        for (int l = 0; l < t_lmax + 1; l++) {
          double integral = 0.0, integrald = 0.0;
@@ -807,7 +807,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
     double z = t_rij(ipair, 2);
     ipair++;
 
-    double r = sqrt(x * x + y * y + z * z);
+    double r = Kokkos::Experimental::sqrt(x * x + y * y + z * z);
 
     if (r < SMALL) continue;
     for (int ti = 0; ti < m_idxu_count; ti++) {
@@ -946,7 +946,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
     double z = t_rij(ipair, 2);
     ipair++;
 
-    double r = sqrt(x * x + y * y + z * z);
+    double r = Kokkos::Experimental::sqrt(x * x + y * y + z * z);
 
     if (r < SMALL) continue;
 
@@ -987,7 +987,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
     ipair++;
     auto dplist_r=Kokkos::subview(k_dplist_r,ipair-1,Kokkos::ALL, Kokkos::ALL);
 
-    double r = sqrt(x * x + y * y + z * z);
+    double r = Kokkos::Experimental::sqrt(x * x + y * y + z * z);
     if (r < SMALL) continue;
 
     for (int ti = 0; ti < m_idxu_count; ti++) {
@@ -1008,7 +1008,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
         for (int j=0;j<3;++j)
           dYlm_r(i,j) = dYlm_i(i,j) = 0.0;
 
-      double comj_i = 1.0 / sqrt(2.0);
+      double comj_i = 1.0 / Kokkos::Experimental::sqrt(2.0);
       double oneofr = 1.0 / r;
 
       double dexpfac[3];
@@ -1055,11 +1055,11 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
             xcovm1_r -= dfact[5] * m_Ylms[idx]*(ulist_r[m_idxylm[idx]]);
             xcovm1_i -= dfact[5] * m_Ylms[idx]*(ulist_i[m_idxylm[idx]]);
           }
-          dYlm_r(i, 0) = 1.0 / sqrt(2.0) * (xcovm1_r - xcovpl1_r);
+          dYlm_r(i, 0) = 1.0 / Kokkos::Experimental::sqrt(2.0) * (xcovm1_r - xcovpl1_r);
           dYlm_r(i, 1) = -comj_i * (xcovm1_i + xcovpl1_i);
           dYlm_r(i, 2) = xcov0_r;
 
-          dYlm_i(i, 0) = 1.0 / sqrt(2.0) * (xcovm1_i - xcovpl1_i);
+          dYlm_i(i, 0) = 1.0 / Kokkos::Experimental::sqrt(2.0) * (xcovm1_i - xcovpl1_i);
           dYlm_i(i, 1) = comj_i * (xcovm1_r + xcovpl1_r);
           dYlm_i(i, 2) = xcov0_i;
 
@@ -1109,7 +1109,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
         for (int n2 = 0; n2 < n + 1; n2++) {
           int j = 0;
           for (int l = 0; l < t_lmax + 1; l++) {
-            double norm = 2.0 * sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
+            double norm = 2.0 * Kokkos::Experimental::sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
             for (int m = -l; m < l + 1; m++) {
               for (int idim = 0; idim < 3; idim++) {
                 double temp_r;
@@ -1166,7 +1166,7 @@ void MLIAP_SO3Kokkos<DeviceType>::operator() (const MLIAP_SO3Kokkos<DeviceType>:
         for (int n2 = 0; n2 < n + 1; n2++) {
           int j = 0;
           for (int l = 0; l < t_lmax + 1; l++) {
-            double norm = 2.0 * sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
+            double norm = 2.0 * Kokkos::Experimental::sqrt(2.0) * MY_PI / sqrt(2.0 * l + 1.0);
             for (int m = -l; m < l + 1; m++) {
               for (int idim = 0; idim < 3; idim++) {
                 double temp_r;

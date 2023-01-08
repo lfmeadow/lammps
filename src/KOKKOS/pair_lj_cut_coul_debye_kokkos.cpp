@@ -183,9 +183,9 @@ compute_fcoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r = 1.0/rinv;
-  const F_FLOAT screening = exp(-kappa*r);
+  const F_FLOAT screening = Kokkos::Experimental::exp(-kappa*r);
   F_FLOAT forcecoul;
 
   forcecoul = qqrd2e * qtmp * q(j) * screening * (kappa + rinv);
@@ -225,9 +225,9 @@ compute_ecoul(const F_FLOAT& rsq, const int& /*i*/, const int&j,
               const F_FLOAT& factor_coul, const F_FLOAT& qtmp) const {
 
   const F_FLOAT r2inv = 1.0/rsq;
-  const F_FLOAT rinv = sqrt(r2inv);
+  const F_FLOAT rinv = Kokkos::Experimental::sqrt(r2inv);
   const F_FLOAT r = 1.0/rinv;
-  const F_FLOAT screening = exp(-kappa*r);
+  const F_FLOAT screening = Kokkos::Experimental::exp(-kappa*r);
 
   return factor_coul * qqrd2e * qtmp * q(j) * rinv * screening;
 }

@@ -288,7 +288,7 @@ const {
 
     // Now compute derivatives
     const double rbound = ebound_meam[elti][eltj] * rij2;
-    const double rij = sqrt(rij2);
+    const double rij = Kokkos::Experimental::sqrt(rij2);
     const double rnorm = (cutforce - rij) * drinv;
     double sij = 1.0;
 
@@ -450,7 +450,7 @@ MEAMKokkos<DeviceType>::calc_rho1(int i, int /*ntype*/, typename AT::t_int_1d ty
       const double rij2 = delij[0] * delij[0] + delij[1] * delij[1] + delij[2] * delij[2];
       if (rij2 < cutforcesq) {
         const int eltj = d_map[type[j]];
-        const double rij = sqrt(rij2);
+        const double rij = Kokkos::Experimental::sqrt(rij2);
         const double ai = rij / re_meam[elti][elti] - 1.0;
         const double aj = rij / re_meam[eltj][eltj] - 1.0;
         const double ro0i = rho0_meam[elti];
